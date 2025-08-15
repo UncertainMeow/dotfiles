@@ -1,0 +1,22 @@
+# Ghostty Configuration for Homelab Work
+
+# Font configuration
+font-family = "JetBrains Mono Nerd Font"
+font-size = 14
+
+# Theme
+theme = "catppuccin-mocha"
+
+# Window settings
+window-padding-x = 10
+window-padding-y = 10
+window-decoration = true
+
+# Performance
+macos-option-as-alt = true
+copy-on-select = true
+confirm-close-surface = false
+
+# Shell integration
+shell-integration = zsh
+shell-integration-features = cursor,sudo,title
