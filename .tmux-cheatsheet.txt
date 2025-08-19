@@ -36,9 +36,9 @@
 ║  ?           Show help                   r           Reload config           ║
 ║                                          :           Command mode           ║
 ║                                                                              ║
-║ CAPSLOCK SUPER KEYS (No prefix needed!)                                     ║
-║  CapsLock         Instant help popup    Shift+CapsLock    New window        ║
-║  Ctrl+CapsLock    Save session          Alt+CapsLock      Detach session    ║
+║ CONVENIENT SHORTCUTS                                                        ║
+║  C           Cheatsheet popup            s           Save session           ║
+║  d           Detach safely               c           New window (curr path) ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 Outside tmux:
