@@ -19,6 +19,8 @@ mkdir -p ~/dotfiles_backup/$(date +%Y%m%d_%H%M%S)
 BACKUP_DIR=~/dotfiles_backup/$(date +%Y%m%d_%H%M%S)
 
 cp ~/.tmux.conf "$BACKUP_DIR/" 2>/dev/null && echo "  ✓ Backed up ~/.tmux.conf" || echo "  - No existing ~/.tmux.conf"
+cp ~/.zshrc "$BACKUP_DIR/" 2>/dev/null && echo "  ✓ Backed up ~/.zshrc" || echo "  - No existing ~/.zshrc"
+cp ~/.zprofile "$BACKUP_DIR/" 2>/dev/null && echo "  ✓ Backed up ~/.zprofile" || echo "  - No existing ~/.zprofile"
 cp ~/.ssh/config "$BACKUP_DIR/" 2>/dev/null && echo "  ✓ Backed up ~/.ssh/config" || echo "  - No existing ~/.ssh/config"
 cp ~/.config/ghostty/config "$BACKUP_DIR/" 2>/dev/null && echo "  ✓ Backed up ghostty config" || echo "  - No existing ghostty config"
 cp ~/.tmux-cheatsheet.txt "$BACKUP_DIR/" 2>/dev/null || true
@@ -41,6 +43,8 @@ fi
 # Copy configuration files
 echo "⚙️  Installing configuration files..."
 cp .tmux.conf ~ && echo "  ✓ tmux configuration"
+cp .zshrc ~ && echo "  ✓ zsh configuration (shell aliases & settings)"
+cp .zprofile ~ && echo "  ✓ zsh profile (PATH & environment setup)"
 cp .tmux-cheatsheet.txt ~ && echo "  ✓ tmux cheatsheet"
 cp ssh_config ~/.ssh/config && echo "  ✓ SSH configuration"
 cp ghostty_config ~/.config/ghostty/config && echo "  ✓ Ghostty terminal configuration"
@@ -49,6 +53,8 @@ cp ghostty_config ~/.config/ghostty/config && echo "  ✓ Ghostty terminal confi
 chmod 644 ~/.ssh/config
 chmod 644 ~/.config/ghostty/config 2>/dev/null || true
 chmod 644 ~/.tmux.conf
+chmod 644 ~/.zshrc
+chmod 644 ~/.zprofile
 chmod 644 ~/.tmux-cheatsheet.txt
 
 echo ""

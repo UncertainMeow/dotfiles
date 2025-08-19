@@ -61,6 +61,11 @@ mkdir -p "${ZSH_COMPDUMP:h}"
 compinit -C -d "$ZSH_COMPDUMP"
 zinit cdreplay -q
 
+# 1Password CLI completion (moved from .zprofile)
+if command -v op >/dev/null 2>&1; then
+  eval "$(op completion zsh)"; compdef _op op
+fi
+
 # Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
@@ -153,6 +158,9 @@ alias repos='cd ~/repos'
 alias ref='cd ~/reference'
 alias dots='cd ~/.dotfiles'
 
+# Tmux management
+alias tmux-clean="rm -rf ~/.local/share/tmux/resurrect/* && echo 'Tmux restore data cleared'"
+
 # Better defaults
 alias grep='grep --color=auto'
 alias cat='bat --paging=never'
@@ -171,9 +179,10 @@ alias nvim='echo "Ready for nvim? Remove this alias first!" && nano'
 if command -v fzf >/dev/null 2>&1; then
   export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --margin=1 --padding=1'
   
-  # Install FZF key bindings
-  "$(brew --prefix)"/opt/fzf/install --key-bindings --completion --no-update-rc 2>/dev/null || true
+  # Source FZF files if they exist (skip installation to avoid console output)
+  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
   
+  # Fallback to brew-installed fzf shell integrations
   for f in "$(brew --prefix 2>/dev/null)/opt/fzf/shell"/{completion,key-bindings}.zsh; do
     [ -f "$f" ] && source "$f"
   done
@@ -189,9 +198,9 @@ if command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook zsh)"
 fi
 
-# Terraform completion
+# Terraform completion (use compdef for zsh)
 if command -v terraform >/dev/null 2>&1; then
-  complete -C terraform terraform
+  compdef _terraform terraform
 fi
 
 # =============================================================================
@@ -238,3 +247,6 @@ export XDG_CACHE_HOME="$HOME/.cache"
     [ -f "$f" ] && zcompile -R -- "$f" "${f}.zwc" 2>/dev/null || true
   done
 } &!
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
