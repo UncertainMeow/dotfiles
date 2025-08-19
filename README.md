@@ -6,14 +6,17 @@
 
 ### Core Configuration
 - **Tmux configuration** with Catppuccin theme and homelab-optimized keybindings
+- **Zsh configuration** with modern shell enhancements and completions
 - **SSH configuration** for secure homelab host management  
 - **Ghostty terminal** configuration with optimized settings
 - **Tmux cheatsheet** for quick reference
 
 ### Key Features
+- **Persistent window naming** - manual tmux window names that stick when switching
 - **Session persistence** - automatic save/restore of tmux sessions
 - **Vim-style navigation** - consistent keybindings across all tools
 - **Quick access shortcuts** - prefix-based commands for common tasks
+- **Modern shell** - zsh with zinit plugin manager, completions, and productivity tools
 - **Plugin management** - automatic TPM installation and plugin support
 - **Infrastructure focus** - optimized for server management workflows
 
@@ -84,7 +87,9 @@ All tmux commands use the **Ctrl-a** prefix:
 
 | File | Purpose | Location |
 |------|---------|----------|
-| `.tmux.conf` | Tmux configuration with plugins | `~/` |
+| `.tmux.conf` | Tmux configuration with plugins and persistent naming | `~/` |
+| `.zshrc` | Zsh shell configuration with modern features | `~/` |
+| `.zprofile` | Zsh profile with PATH and environment setup | `~/` |
 | `.tmux-cheatsheet.txt` | Quick reference guide | `~/` |
 | `ssh_config` | SSH client configuration | `~/.ssh/config` |
 | `ghostty_config` | Terminal emulator settings | `~/.config/ghostty/config` |
@@ -97,9 +102,17 @@ All tmux commands use the **Ctrl-a** prefix:
 
 ## Troubleshooting
 
+**Tmux window names reverting?**
+- Reload config with `Ctrl-a + r` 
+- Rename windows with `Ctrl-a + ,` - names should now persist when switching
+
 **Tmux plugins not working?**
 - Run `Ctrl-a + I` to install plugins
 - Check `~/.tmux/plugins/tpm` exists
+
+**Shell completion errors?**
+- Start a fresh terminal session after installation
+- Existing sessions may show `compdef` errors that resolve in new terminals
 
 **SSH connections failing?**  
 - Verify SSH config syntax: `ssh -F ~/.ssh/config -T <hostname>`

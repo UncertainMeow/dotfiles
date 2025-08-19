@@ -63,7 +63,10 @@ zinit cdreplay -q
 
 # 1Password CLI completion (moved from .zprofile)
 if command -v op >/dev/null 2>&1; then
-  eval "$(op completion zsh)"; compdef _op op
+  eval "$(op completion zsh)"
+  if type compdef >/dev/null 2>&1; then
+    compdef _op op
+  fi
 fi
 
 # Completion styling
@@ -200,7 +203,9 @@ fi
 
 # Terraform completion (use compdef for zsh)
 if command -v terraform >/dev/null 2>&1; then
-  compdef _terraform terraform
+  if type compdef >/dev/null 2>&1; then
+    compdef _terraform terraform
+  fi
 fi
 
 # =============================================================================
