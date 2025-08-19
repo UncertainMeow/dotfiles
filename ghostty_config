@@ -1,8 +1,9 @@
 # Ghostty Configuration for Homelab Work
 
-# Font configuration
+# Font configuration optimized for server monitoring
 font-family = "JetBrains Mono Nerd Font"
-font-size = 14
+font-size = 13
+font-weight = "medium"
 
 # Theme
 theme = "catppuccin-mocha"
@@ -11,12 +12,19 @@ theme = "catppuccin-mocha"
 window-padding-x = 10
 window-padding-y = 10
 window-decoration = true
+window-title-format = "ghostty - #{title}"
 
-# Performance
+# Cursor and visual feedback for config editing
+cursor-style = "block"
+cursor-opacity = 0.8
+unfocused-split-opacity = 0.7
+
+# App behavior (no quit confirmations, but keep app running)
 macos-option-as-alt = true
 copy-on-select = true
 confirm-close-surface = false
+quit-after-last-window-closed = false
 
-# Shell integration
+# Shell integration with hostname display for SSH sessions
 shell-integration = zsh
-shell-integration-features = cursor,sudo,title
+shell-integration-features = cursor,sudo,title,hostname
