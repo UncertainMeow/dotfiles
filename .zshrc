@@ -46,11 +46,9 @@ source "$ZINIT_HOME/zinit.zsh"
 # Prompt
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-# Essential ZSH enhancements
+# Essential ZSH enhancements (syntax highlighting and autosuggestions don't need compinit)
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-autosuggestions
-zinit light zsh-users/zsh-completions
-zinit light Aloxaf/fzf-tab
 
 # =============================================================================
 # COMPLETIONS
@@ -58,15 +56,22 @@ zinit light Aloxaf/fzf-tab
 autoload -Uz compinit
 ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/compdump"
 mkdir -p "${ZSH_COMPDUMP:h}"
+
+# Fix insecure directories to prevent compinit from silently failing
+if command -v compaudit >/dev/null 2>&1; then
+  compaudit | xargs -r chmod g-w,o-w 2>/dev/null
+fi
+
 compinit -C -d "$ZSH_COMPDUMP"
 zinit cdreplay -q
 
-# 1Password CLI completion (moved from .zprofile)
-if command -v op >/dev/null 2>&1; then
+# Load completion-dependent plugins AFTER compinit
+zinit light zsh-users/zsh-completions
+zinit light Aloxaf/fzf-tab
+
+# Program completions that output compdef go AFTER compinit, and only if compdef exists
+if command -v op >/dev/null 2>&1 && typeset -f compdef >/dev/null 2>&1; then
   eval "$(op completion zsh)"
-  if type compdef >/dev/null 2>&1; then
-    compdef _op op
-  fi
 fi
 
 # Completion styling
@@ -191,8 +196,8 @@ if command -v fzf >/dev/null 2>&1; then
   done
 fi
 
-# Zoxide (smart cd)
-if command -v zoxide >/dev/null 2>&1; then
+# Zoxide (smart cd) - only if compdef exists
+if command -v zoxide >/dev/null 2>&1 && typeset -f compdef >/dev/null 2>&1; then
   eval "$(zoxide init --cmd cd zsh)"
 fi
 
@@ -255,3 +260,4 @@ export XDG_CACHE_HOME="$HOME/.cache"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+source /Users/kellen/.config/op/plugins.sh
