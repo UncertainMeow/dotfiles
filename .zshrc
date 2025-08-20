@@ -179,6 +179,86 @@ alias ps='ps aux'
 alias vim='echo "Learning vim? Try: vimtutor" && nano'
 alias nvim='echo "Ready for nvim? Remove this alias first!" && nano'
 
+# Dotfiles management
+function mac-dots-update() {
+  local repo_path="$HOME/code/UncertainMeow/dotfiles"
+  local commit_msg="$1"
+  
+  echo "🔄 Syncing dotfiles to repo..."
+  
+  # Check if repo exists
+  if [[ ! -d "$repo_path" ]]; then
+    echo "❌ Error: Dotfiles repo not found at $repo_path"
+    return 1
+  fi
+  
+  # Change to repo directory
+  cd "$repo_path" || return 1
+  
+  # Copy files from home to repo
+  echo "📋 Copying files from home directory to repo..."
+  cp ~/.zshrc .zshrc && echo "  ✓ .zshrc"
+  cp ~/.zprofile .zprofile && echo "  ✓ .zprofile" 
+  cp ~/.tmux.conf .tmux.conf 2>/dev/null && echo "  ✓ .tmux.conf" || echo "  - .tmux.conf not found"
+  cp ~/.ssh/config ssh_config 2>/dev/null && echo "  ✓ ssh_config" || echo "  - ssh_config not found"
+  cp ~/.config/ghostty/config ghostty_config 2>/dev/null && echo "  ✓ ghostty_config" || echo "  - ghostty_config not found"
+  
+  # Check if there are changes
+  if [[ -z "$(git status --porcelain)" ]]; then
+    echo "✨ No changes to commit - dotfiles are already in sync!"
+    return 0
+  fi
+  
+  # Show what changed
+  echo "📝 Changes detected:"
+  git status --short
+  
+  # Get commit message
+  if [[ -z "$commit_msg" ]]; then
+    commit_msg="Update dotfiles configuration"
+  fi
+  
+  # Commit and push
+  echo "🚀 Committing and pushing changes..."
+  git add -A
+  git commit -m "$commit_msg
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+  
+  if git push; then
+    echo "✅ Dotfiles successfully synced to GitHub!"
+    echo "💡 On other machines, run: cd $repo_path && git pull && ./install.sh"
+  else
+    echo "❌ Error: Failed to push to GitHub"
+    return 1
+  fi
+}
+
+function mac-dots-pull() {
+  local repo_path="$HOME/code/UncertainMeow/dotfiles"
+  
+  echo "⬇️  Pulling latest dotfiles from GitHub..."
+  
+  # Check if repo exists
+  if [[ ! -d "$repo_path" ]]; then
+    echo "❌ Error: Dotfiles repo not found at $repo_path"
+    return 1
+  fi
+  
+  cd "$repo_path" || return 1
+  
+  if git pull; then
+    echo "🔄 Installing updated dotfiles..."
+    ./install.sh
+    echo "✅ Dotfiles updated! Restart your terminal or run 'exec zsh'"
+  else
+    echo "❌ Error: Failed to pull from GitHub"
+    return 1
+  fi
+}
+
 # =============================================================================
 # SHELL INTEGRATIONS
 # =============================================================================
