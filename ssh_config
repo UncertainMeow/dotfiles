@@ -1,6 +1,16 @@
-Host 10.203.3.165
-  HostName 10.203.3.165
+# LAN hosts (local network)
+Host lan-nas
+  HostName 10.203.3.99
+  User admin
+
+Host lan-socrates
+  HostName 10.203.3.42
+  User root
+
+# Global SSH settings
 Host *
-	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-Host *
-	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+  IdentitiesOnly yes
+  # Specify your exact key names here once you've rotated them
+  # IdentityFile ~/.ssh/homelab_key
+  # IdentityFile ~/.ssh/automation_key
