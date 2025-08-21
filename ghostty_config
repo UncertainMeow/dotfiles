@@ -3,7 +3,6 @@
 # Font configuration optimized for server monitoring
 font-family = "JetBrains Mono Nerd Font"
 font-size = 13
-font-weight = 500
 
 # Theme
 theme = "catppuccin-mocha"
@@ -12,7 +11,6 @@ theme = "catppuccin-mocha"
 window-padding-x = 10
 window-padding-y = 10
 window-decoration = true
-window-title = "ghostty"
 
 # Cursor and visual feedback for config editing
 cursor-style = "block"
