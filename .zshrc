@@ -145,10 +145,6 @@ alias gco='git checkout'
 alias gm='git merge'
 alias lg='lazygit'
 
-# SSH shortcuts (update IPs as needed)
-alias socrates='ssh root@10.203.3.42'  # AI workload server
-alias stuffs='ssh admin@10.203.3.99'   # UGREEN NAS
-
 # Homelab utilities
 alias tailup='tailscale up --ssh'
 alias taildown='tailscale down'
@@ -162,7 +158,7 @@ alias localip='ipconfig getifaddr en0'
 # Quick navigation
 alias h='cd ~'
 alias lab='cd ~/homelab'
-alias repos='cd ~/repos'
+alias repo='cd ~/_code'
 alias ref='cd ~/reference'
 alias dots='cd ~/.dotfiles'
 
@@ -340,4 +336,8 @@ export XDG_CACHE_HOME="$HOME/.cache"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-source /Users/kellen/.config/op/plugins.sh
+
+if [[ -f /Users/kellen/.config/op/plugins.sh ]]; then
+  source /Users/kellen/.config/op/plugins.sh
+fi
+
