@@ -80,3 +80,38 @@ mkdir -p "$XDG_STATE_HOME/less" \
 # Set appropriate permissions for security-sensitive directories
 [[ -d "$XDG_DATA_HOME/gnupg" ]] && chmod 700 "$XDG_DATA_HOME/gnupg"
 [[ -d "$XDG_CONFIG_HOME/aws" ]] && chmod 700 "$XDG_CONFIG_HOME/aws"
+
+# =============================================================================
+# EXTERNAL TOOL INTEGRATIONS
+# =============================================================================
+
+# Zoxide (smart cd) - with fallback to native cd
+if command -v zoxide >/dev/null 2>&1 && typeset -f compdef >/dev/null 2>&1; then
+  # Initialize zoxide without replacing cd
+  eval "$(zoxide init zsh)"
+
+  # Create a hybrid cd function that tries zoxide first, falls back to builtin cd
+  cd() {
+    if [[ $# -eq 0 ]]; then
+      # No arguments - go to home directory (standard cd behavior)
+      builtin cd
+    elif [[ -d "$1" ]] || [[ "$1" == "-" ]] || [[ "$1" =~ ^[-+][0-9]*$ ]]; then
+      # If it's a valid directory, dash (previous dir), or stack notation (+1, -2, etc.)
+      # Use builtin cd directly
+      builtin cd "$@"
+    else
+      # Try zoxide first for fuzzy matching
+      if __zoxide_z "$@" 2>/dev/null; then
+        return 0
+      else
+        # If zoxide fails, fall back to builtin cd
+        builtin cd "$@"
+      fi
+    fi
+  }
+fi
+
+# Direnv (project environments)
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
