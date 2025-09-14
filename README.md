@@ -1,26 +1,26 @@
-# Homelab Dotfiles
+# Dotfiles
 
-🏠 Production-ready terminal configuration for homelab infrastructure management and development work.
+Modern terminal configuration for homelab infrastructure management and development work.
 
 ## What's Included
 
-### Core Configuration
-- **Tmux configuration** with Catppuccin theme and homelab-optimized keybindings
-- **Zsh configuration** with modern shell enhancements and completions
-- **SSH configuration** for secure homelab host management  
-- **Ghostty terminal** configuration with optimized settings
-- **Tmux cheatsheet** for quick reference
+### **Terminal Configuration**
+- **tmux** - Session management with persistent naming and Catppuccin theme
+- **zsh** - Modern shell with plugin management and intelligent completions
+- **Modular config** - Organized by function (aliases, functions, environment, etc.)
 
-### Key Features
-- **Persistent window naming** - manual tmux window names that stick when switching
-- **Session persistence** - automatic save/restore of tmux sessions
-- **Vim-style navigation** - consistent keybindings across all tools
-- **Quick access shortcuts** - prefix-based commands for common tasks
-- **Modern shell** - zsh with zinit plugin manager, completions, and productivity tools
-- **Plugin management** - automatic TPM installation and plugin support
-- **Infrastructure focus** - optimized for server management workflows
+### **Development Tools**
+- **Environment Launcher** - Hammerspoon hotkey (⌘+Shift+D) for instant dev containers/VMs
+- **Cross-platform support** - macOS, Arch, NixOS, Bazzite-specific optimizations
+- **Modern replacements** - eza instead of ls, better defaults
 
-## Quick Installation
+### **Key Features**
+- **Modular design** - Easy to customize and maintain
+- **Safety first** - Interactive mode for destructive commands
+- **Infrastructure focus** - Optimized for server management workflows
+- **Plugin management** - Automatic zinit setup and plugin loading
+
+## Quick Install
 
 ```bash
 git clone https://github.com/UncertainMeow/dotfiles.git
@@ -28,96 +28,68 @@ cd dotfiles
 ./install.sh
 ```
 
-The install script will:
-- Back up your existing configurations with timestamps
-- Install tmux plugin manager (TPM) automatically
-- Set up all configuration files with proper permissions
-- Provide clear next steps for completing the setup
+## Environment Launcher
 
-## Manual Installation
+Hit **⌘+Shift+D** to get instant access to:
+- 🐍 Python development containers
+- 🟢 Node.js environments 
+- 🦀 Rust development setup
+- 🧪 Clean testing environments
+- 🖥️ Virtual machines (UTM integration)
+- 🧹 System management tools
 
-If you prefer to install manually:
+### Setup Environment Launcher
+1. Install dependencies: `brew install fzf docker yq`
+2. Make sure Docker Desktop is running
+3. Add to your `~/.hammerspoon/init.lua`:
 
-```bash
-# Create directories
-mkdir -p ~/.config/ghostty ~/.ssh ~/.tmux/plugins
-
-# Install TPM (tmux plugin manager)
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-
-# Copy configurations
-cp .tmux.conf ~/ 
-cp .tmux-cheatsheet.txt ~/
-cp ssh_config ~/.ssh/config
-cp ghostty_config ~/.config/ghostty/config
-
-# Set permissions
-chmod 644 ~/.ssh/config ~/.tmux.conf
+```lua
+-- Environment Launcher hotkey (⌘+Shift+D)
+dofile(os.getenv("HOME") .. "/dotfiles/environment-launcher/hammerspoon-setup.lua")
 ```
 
-## Post-Installation Setup
+## Configuration Structure
 
-1. **Start tmux**: `tmux`
-2. **Install plugins**: Press `Ctrl-a + I` to install tmux plugins
-3. **View cheatsheet**: Press `Ctrl-a + C` for quick reference
-4. **Test SSH config**: Verify your homelab hosts are accessible
+```
+dotfiles/
+├── .tmux.conf              # tmux configuration
+├── .zshrc                  # Main zsh config (loads modules)
+├── install.sh              # Installation script
+├── config/
+│   └── zsh/
+│       ├── aliases.zsh     # Command aliases
+│       ├── functions.zsh   # Useful shell functions
+│       ├── environment.zsh # PATH and environment variables
+│       ├── history.zsh     # History configuration
+│       ├── completion.zsh  # Completion settings
+│       └── os/             # OS-specific configurations
+└── environment-launcher/   # Development environment hotkey system
+```
 
-## Key Bindings
+## Customization
 
-All tmux commands use the **Ctrl-a** prefix:
+### Adding Personal Aliases
+Edit `config/zsh/aliases.zsh` or create `~/.zshrc.local` for local-only customizations.
 
-### Essential Shortcuts
-- `Ctrl-a + c` - New window in current directory
-- `Ctrl-a + C` - Show cheatsheet popup
-- `Ctrl-a + s` - Save session  
-- `Ctrl-a + d` - Detach session safely
+### OS-Specific Configuration
+The system automatically loads the appropriate config from `config/zsh/os/` based on your operating system.
 
-### Navigation  
-- `Ctrl-a + h/j/k/l` - Navigate panes (vim-style)
-- `Ctrl-a + H/J/K/L` - Resize panes
-- `Ctrl-a + |` - Split horizontally
-- `Ctrl-a + -` - Split vertically
+### Environment Variables
+Add your PATH modifications and exports to `config/zsh/environment.zsh`.
 
-### Session Management
-- `Ctrl-a + S` - New session
-- `Ctrl-a + K` - Kill session  
-- Outside tmux: `tmux a` to reattach
+## Useful Functions
 
-## Configuration Files
+- `mkcd <dir>` - Create directory and cd into it
+- `up [n]` - Go up n directories (default: 1)
+- Various git shortcuts and file operations
 
-| File | Purpose | Location |
-|------|---------|----------|
-| `.tmux.conf` | Tmux configuration with plugins and persistent naming | `~/` |
-| `.zshrc` | Zsh shell configuration with modern features | `~/` |
-| `.zprofile` | Zsh profile with PATH and environment setup | `~/` |
-| `.tmux-cheatsheet.txt` | Quick reference guide | `~/` |
-| `ssh_config` | SSH client configuration | `~/.ssh/config` |
-| `ghostty_config` | Terminal emulator settings | `~/.config/ghostty/config` |
+## Modern Tool Integration
 
-## Compatibility
+- **eza** - Modern ls replacement with icons and git integration
+- **fzf** - Fuzzy finding for command history and files
+- **vivid** - Modern LS_COLORS with Catppuccin theme
+- **powerlevel10k** - Fast, customizable prompt
 
-- **Primary**: macOS (tested and optimized)
-- **Secondary**: Linux (should work with minimal adjustments)
-- **Requirements**: Git, tmux, modern terminal emulator
+---
 
-## Troubleshooting
-
-**Tmux window names reverting?**
-- Reload config with `Ctrl-a + r` 
-- Rename windows with `Ctrl-a + ,` - names should now persist when switching
-
-**Tmux plugins not working?**
-- Run `Ctrl-a + I` to install plugins
-- Check `~/.tmux/plugins/tpm` exists
-
-**Shell completion errors?**
-- Start a fresh terminal session after installation
-- Existing sessions may show `compdef` errors that resolve in new terminals
-
-**SSH connections failing?**  
-- Verify SSH config syntax: `ssh -F ~/.ssh/config -T <hostname>`
-- Check host key fingerprints match your homelab
-
-**Permission issues?**
-- SSH config: `chmod 644 ~/.ssh/config`
-- Tmux config: `chmod 644 ~/.tmux.conf`
+No buzzwords, just practical terminal configuration that works.

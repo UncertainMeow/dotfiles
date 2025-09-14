@@ -1,7 +1,7 @@
 #!/bin/bash
-# Dotfiles installer for homelab infrastructure work
+# Dotfiles installer - modular terminal configuration
 
-echo "🏠 Installing homelab dotfiles..."
+echo "🚀 Installing modern dotfiles..."
 
 # Check if running on macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then
@@ -43,11 +43,20 @@ fi
 # Copy configuration files
 echo "⚙️  Installing configuration files..."
 cp .tmux.conf ~ && echo "  ✓ tmux configuration"
-cp .zshrc ~ && echo "  ✓ zsh configuration (shell aliases & settings)"
-cp .zprofile ~ && echo "  ✓ zsh profile (PATH & environment setup)"
-cp .tmux-cheatsheet.txt ~ && echo "  ✓ tmux cheatsheet"
-cp ssh_config ~/.ssh/config && echo "  ✓ SSH configuration"
-cp ghostty_config ~/.config/ghostty/config && echo "  ✓ Ghostty terminal configuration"
+cp .zshrc ~ && echo "  ✓ zsh configuration (modular setup)"
+
+# Copy modular config directory
+if [[ -d config ]]; then
+    cp -r config ~/dotfiles-config && echo "  ✓ modular zsh configurations"
+else
+    echo "  ⚠️  config directory not found"
+fi
+
+# Copy optional files if they exist
+[[ -f .zprofile ]] && cp .zprofile ~ && echo "  ✓ zsh profile"
+[[ -f .tmux-cheatsheet.txt ]] && cp .tmux-cheatsheet.txt ~ && echo "  ✓ tmux cheatsheet"
+[[ -f ssh_config ]] && cp ssh_config ~/.ssh/config && echo "  ✓ SSH configuration"
+[[ -f ghostty_config ]] && cp ghostty_config ~/.config/ghostty/config && echo "  ✓ Ghostty terminal configuration"
 
 # Set proper permissions
 chmod 644 ~/.ssh/config
