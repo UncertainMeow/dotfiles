@@ -28,6 +28,7 @@ cp ~/.tmux-cheatsheet.txt "$BACKUP_DIR/" 2>/dev/null || true
 # Create required directories
 echo "📁 Creating required directories..."
 mkdir -p ~/.config/ghostty
+mkdir -p ~/.config/alacritty/themes
 mkdir -p ~/.ssh
 mkdir -p ~/.tmux/plugins
 
@@ -57,10 +58,14 @@ fi
 [[ -f .tmux-cheatsheet.txt ]] && cp .tmux-cheatsheet.txt ~ && echo "  ✓ tmux cheatsheet"
 [[ -f ssh_config ]] && cp ssh_config ~/.ssh/config && echo "  ✓ SSH configuration"
 [[ -f ghostty_config ]] && cp ghostty_config ~/.config/ghostty/config && echo "  ✓ Ghostty terminal configuration"
+[[ -f alacritty_config.toml ]] && cp alacritty_config.toml ~/.config/alacritty/alacritty.toml && echo "  ✓ Alacritty terminal configuration"
+[[ -f alacritty_theme_catppuccin-mocha.toml ]] && cp alacritty_theme_catppuccin-mocha.toml ~/.config/alacritty/themes/catppuccin-mocha.toml && echo "  ✓ Alacritty Catppuccin theme"
 
 # Set proper permissions
 chmod 644 ~/.ssh/config
 chmod 644 ~/.config/ghostty/config 2>/dev/null || true
+chmod 644 ~/.config/alacritty/alacritty.toml 2>/dev/null || true
+chmod 644 ~/.config/alacritty/themes/catppuccin-mocha.toml 2>/dev/null || true
 chmod 644 ~/.tmux.conf
 chmod 644 ~/.zshrc
 chmod 644 ~/.zprofile
@@ -76,6 +81,7 @@ echo "  3. Use 'Ctrl-a + C' for the tmux cheatsheet"
 echo ""
 echo "💡 Key features:"
 echo "  • tmux with homelab-optimized keybindings"
-echo "  • SSH config for infrastructure work"  
-echo "  • Ghostty terminal configuration"
+echo "  • SSH config for infrastructure work"
+echo "  • Ghostty & Alacritty terminal configurations"
 echo "  • Session persistence and restoration"
+echo "  • Catppuccin Mocha theme for both terminals"

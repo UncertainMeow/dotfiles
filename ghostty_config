@@ -26,3 +26,6 @@ quit-after-last-window-closed = false
 # Shell integration with hostname display for SSH sessions
 shell-integration = zsh
 shell-integration-features = cursor,sudo,title
+
+# Terminal identification for SSH compatibility
+term = xterm-256color

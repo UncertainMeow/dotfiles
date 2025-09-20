@@ -115,3 +115,13 @@ fi
 if command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook zsh)"
 fi
+
+# =============================================================================
+# TERMINAL COMPATIBILITY
+# =============================================================================
+
+# Ensure TERM is set properly for SSH connections
+# Some remote servers expect standard terminal types
+if [[ -z "$TERM" ]] || [[ "$TERM" == "ghostty" ]]; then
+  export TERM="xterm-256color"
+fi
