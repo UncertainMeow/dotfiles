@@ -1,0 +1,62 @@
+# Pre-commit hooks for dotfiles validation
+# Install with: pip install pre-commit && pre-commit install
+
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^\.tmux\.conf$
+      - id: end-of-file-fixer
+      - id: check-yaml
+        files: \.(yaml|yml)$
+      - id: check-toml
+        files: \.toml$
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+
+  # Shell script validation
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        args: [--severity=warning]
+        files: \.(sh|bash)$
+
+  # Local hooks for dotfiles-specific validation
+  - repo: local
+    hooks:
+      # Validate zsh syntax
+      - id: zsh-syntax-check
+        name: Check zsh syntax
+        entry: zsh -n
+        language: system
+        files: \.zsh$
+
+      # Validate tmux config
+      - id: tmux-config-check
+        name: Check tmux config syntax
+        entry: bash -c 'tmux -f $1 list-sessions -F "#{session_name}" 2>/dev/null || echo "tmux config validation failed for $1"; exit 0'
+        language: system
+        files: \.tmux\.conf$
+        pass_filenames: true
+
+      # Check for required dotfiles structure
+      - id: dotfiles-structure-check
+        name: Validate dotfiles structure
+        entry: scripts/validate-structure.sh
+        language: script
+        files: ^(config/|install\.sh|\.zshrc)
+        pass_filenames: false
+        always_run: true
+
+      # Warn about sensitive data
+      - id: check-secrets
+        name: Check for potential secrets
+        entry: bash -c 'if grep -r -i -E "(password|secret|key|token)" --exclude-dir=.git .; then echo "⚠️  Potential secrets detected! Review before committing."; exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
