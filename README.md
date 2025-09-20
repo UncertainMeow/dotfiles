@@ -1,26 +1,8 @@
-# Dotfiles
+# Modern Dotfiles for Infrastructure & Development
 
-Modern terminal configuration for homelab infrastructure management and development work.
+A practical, modular terminal configuration optimized for homelab management and development work. No buzzwords, just tools that work.
 
-## What's Included
-
-### **Terminal Configuration**
-- **tmux** - Session management with persistent naming and Catppuccin theme
-- **zsh** - Modern shell with plugin management and intelligent completions
-- **Modular config** - Organized by function (aliases, functions, environment, etc.)
-
-### **Development Tools**
-- **Environment Launcher** - Hammerspoon hotkey (⌘+Shift+D) for instant dev containers/VMs
-- **Cross-platform support** - macOS, Arch, NixOS, Bazzite-specific optimizations
-- **Modern replacements** - eza instead of ls, better defaults
-
-### **Key Features**
-- **Modular design** - Easy to customize and maintain
-- **Safety first** - Interactive mode for destructive commands
-- **Infrastructure focus** - Optimized for server management workflows
-- **Plugin management** - Automatic zinit setup and plugin loading
-
-## Quick Install
+## Quick Start
 
 ```bash
 git clone https://github.com/UncertainMeow/dotfiles.git
@@ -28,68 +10,135 @@ cd dotfiles
 ./install.sh
 ```
 
-## Environment Launcher
+The installer backs up your existing configs and sets everything up. Compatible with macOS, Arch Linux, NixOS, and Bazzite.
 
-Hit **⌘+Shift+D** to get instant access to:
-- 🐍 Python development containers
-- 🟢 Node.js environments 
-- 🦀 Rust development setup
+## What You Get
+
+### Terminal Emulator Support
+- **Ghostty** - Primary terminal with optimized SSH compatibility
+- **Alacritty** - High-performance backup terminal
+- **Consistent theming** - Catppuccin Mocha across both terminals
+
+### Shell Environment
+- **zsh with zinit** - Modern shell with intelligent plugin management
+- **tmux integration** - Session persistence with server-friendly keybindings
+- **Modern tool replacements** - eza, fzf, vivid, powerlevel10k
+
+### Development Environment Launcher
+Hit **⌘+Shift+D** for instant access to:
+- 🐍 Python containers
+- 🟢 Node.js environments
+- 🦀 Rust development
 - 🧪 Clean testing environments
-- 🖥️ Virtual machines (UTM integration)
-- 🧹 System management tools
+- 🖥️ Virtual machines (UTM)
+- 🧹 System management
 
-### Setup Environment Launcher
-1. Install dependencies: `brew install fzf docker yq`
-2. Make sure Docker Desktop is running
-3. Add to your `~/.hammerspoon/init.lua`:
+## Architecture
+
+This setup uses a **modular copy-based approach** (no symlinks). Configuration is split into logical modules that load in sequence:
+
+```
+~/.zshrc                    # Main config - loads everything else
+~/dotfiles-config/zsh/      # Modular configurations:
+├── environment.zsh         #   PATH, exports, tool integrations
+├── aliases.zsh             #   Command shortcuts
+├── functions.zsh           #   Custom shell functions
+├── history.zsh             #   History behavior
+├── completion.zsh          #   Tab completion settings
+└── os/macos.zsh           #   OS-specific optimizations
+```
+
+**Key design principles:**
+- **Stable**: Live config won't break when experimenting with the repo
+- **Modular**: Each file handles one concern
+- **Ordered**: Components load in dependency order
+- **Safe**: Installer always backs up existing configs
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed implementation guide.
+
+## SSH & Remote Work Optimizations
+
+- **Terminal compatibility** - Automatic TERM variable handling for problematic SSH servers
+- **tmux persistence** - Sessions survive disconnections with proper naming
+- **Infrastructure aliases** - Common server management shortcuts
+- **Cross-platform** - Same config works on local macOS and remote Linux servers
+
+## Environment Launcher Setup
+
+The hotkey system requires these dependencies:
+
+```bash
+brew install fzf docker yq
+```
+
+Add to your `~/.hammerspoon/init.lua`:
 
 ```lua
 -- Environment Launcher hotkey (⌘+Shift+D)
 dofile(os.getenv("HOME") .. "/dotfiles/environment-launcher/hammerspoon-setup.lua")
 ```
 
-## Configuration Structure
+## Customization
+
+### Quick Changes
+Edit configs directly in `~/dotfiles-config/zsh/` - changes apply to new terminals immediately.
+
+### Permanent Changes
+1. Edit files in the repo
+2. Run `./install.sh` to deploy (backs up current config first)
+
+### Local-Only Customizations
+Create `~/.zshrc.local` for machine-specific settings that won't be tracked in git.
+
+### Adding New Modules
+Create new `.zsh` files in `config/zsh/` and add source lines to the main `.zshrc`.
+
+## Included Tools & Functions
+
+**Shell Functions:**
+- `mkcd <dir>` - Create and enter directory
+- `up [n]` - Navigate up n directories
+- `extract <file>` - Universal archive extractor
+- Git shortcuts and file operations
+
+**Modern Replacements:**
+- `eza` instead of `ls` (icons, git integration)
+- `fzf` for fuzzy finding (Ctrl-R history search)
+- `vivid` for modern LS_COLORS
+- `zoxide` for smart directory jumping
+
+## File Structure
 
 ```
 dotfiles/
-├── .tmux.conf              # tmux configuration
-├── .zshrc                  # Main zsh config (loads modules)
-├── install.sh              # Installation script
-├── config/
-│   └── zsh/
-│       ├── aliases.zsh     # Command aliases
-│       ├── functions.zsh   # Useful shell functions
-│       ├── environment.zsh # PATH and environment variables
-│       ├── history.zsh     # History configuration
-│       ├── completion.zsh  # Completion settings
-│       └── os/             # OS-specific configurations
-└── environment-launcher/   # Development environment hotkey system
+├── install.sh                      # Main installer
+├── .zshrc                          # Shell configuration entry point
+├── .tmux.conf                      # Terminal multiplexer config
+├── ghostty_config                  # Primary terminal settings
+├── alacritty_config.toml           # Backup terminal settings
+├── alacritty_theme_catppuccin-mocha.toml # Terminal theme
+├── config/zsh/                     # Modular shell configurations
+│   ├── environment.zsh             # PATH and exports
+│   ├── aliases.zsh                 # Command shortcuts
+│   ├── functions.zsh               # Useful shell functions
+│   ├── history.zsh                 # History configuration
+│   ├── completion.zsh              # Tab completion
+│   └── os/                         # OS-specific configs
+└── environment-launcher/           # Development environment hotkeys
 ```
 
-## Customization
+## Troubleshooting
 
-### Adding Personal Aliases
-Edit `config/zsh/aliases.zsh` or create `~/.zshrc.local` for local-only customizations.
+**Changes not applying?** Open a new terminal - configs only load on shell startup.
 
-### OS-Specific Configuration
-The system automatically loads the appropriate config from `config/zsh/os/` based on your operating system.
+**Broke something?** Restore from `~/dotfiles_backup/TIMESTAMP/` or reinstall.
 
-### Environment Variables
-Add your PATH modifications and exports to `config/zsh/environment.zsh`.
-
-## Useful Functions
-
-- `mkcd <dir>` - Create directory and cd into it
-- `up [n]` - Go up n directories (default: 1)
-- Various git shortcuts and file operations
-
-## Modern Tool Integration
-
-- **eza** - Modern ls replacement with icons and git integration
-- **fzf** - Fuzzy finding for command history and files
-- **vivid** - Modern LS_COLORS with Catppuccin theme
-- **powerlevel10k** - Fast, customizable prompt
+**SSH issues?** The setup includes automatic TERM fixes for compatibility with remote servers.
 
 ---
 
-No buzzwords, just practical terminal configuration that works.
+Built for practical daily use in homelab and development environments.
+
+*Full disclosure: About 90% of this was architected by Claude Code because I was tired of my terminal breaking every time I touched a config file. Turns out AI is pretty good at making things that actually work. Who knew?* 🤖
+
+Contributions welcome - but honestly, it's probably easier to just ask Claude to add whatever you need.
