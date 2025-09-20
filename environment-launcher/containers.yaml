@@ -1,98 +1,145 @@
 containers:
-  python-dev:
-    name: "🐍 Python Development"
-    image: "python:3.11-slim"
+  # ==== LEARNING & EXPLORATION ====
+
+  nixos-playground:
+    name: "❄️ NixOS Learning Environment"
+    image: "nixos/nix:latest"
     volumes:
       - "${PWD}:/workspace"
-      - "${HOME}/.config:/home/dev/.config:ro"
+      - "${HOME}/.config:/home/nixuser/.config:ro"
     environment:
-      - "PYTHONPATH=/workspace"
+      - "NIX_PATH=nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz"
     command: "bash"
-    
-  node-dev:
-    name: "🟢 Node.js Development" 
-    image: "node:20-alpine"
+
+  omakub-arch:
+    name: "🏛️ Omakub (37signals Opinionated Arch)"
+    image: "archlinux:latest"
     volumes:
       - "${PWD}:/workspace"
+    environment:
+      - "TERM=xterm-256color"
+    command: "bash -c 'pacman -Sy --noconfirm git curl && bash'"
+
+  bazzite-gaming:
+    name: "🎮 Bazzite Gaming Environment"
+    image: "fedora:latest"
+    volumes:
+      - "${PWD}:/workspace"
+      - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
+    environment:
+      - "DISPLAY=${DISPLAY}"
+    command: "bash"
+
+  # ==== HOMELAB & INFRASTRUCTURE ====
+
+  k3s-lab:
+    name: "☸️ K3s Kubernetes Lab"
+    image: "rancher/k3s:latest"
+    volumes:
+      - "${PWD}:/workspace"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "K3S_KUBECONFIG_OUTPUT=/workspace/kubeconfig.yaml"
+    privileged: true
     command: "sh"
-    
-  rust-dev:
-    name: "🦀 Rust Development"
-    image: "rust:latest"
+
+  docker-swarm:
+    name: "🐋 Docker Swarm Manager"
+    image: "docker:dind"
     volumes:
       - "${PWD}:/workspace"
-      - "${HOME}/.cargo:/usr/local/cargo"
-    command: "bash"
-    
-  test-env:
-    name: "🧪 Clean Test Environment"
-    image: "ubuntu:22.04" 
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    privileged: true
+    command: "sh"
+
+  ceph-micro:
+    name: "🗄️ MicroCeph Storage Lab"
+    image: "ubuntu:22.04"
+    volumes:
+      - "${PWD}:/workspace"
+    environment:
+      - "DEBIAN_FRONTEND=noninteractive"
+    command: "bash -c 'apt update && apt install -y snapd && bash'"
+
+  # ==== PRACTICAL LEARNING ====
+
+  homelab-toolkit:
+    name: "🏠 Homelab Toolkit"
+    image: "ubuntu:22.04"
+    volumes:
+      - "${PWD}:/workspace"
+      - "${HOME}/.ssh:/root/.ssh:ro"
+    environment:
+      - "TERM=xterm-256color"
+    command: "bash -c 'apt update && apt install -y curl wget git htop ncdu tree jq yq ansible && bash'"
+
+  network-tools:
+    name: "🌐 Network Analysis Lab"
+    image: "nicolaka/netshoot"
     volumes:
       - "${PWD}:/workspace"
     command: "bash"
-    
+
+  monitoring-stack:
+    name: "📊 Monitoring & Observability"
+    image: "grafana/grafana-oss:latest"
+    volumes:
+      - "${PWD}:/workspace"
+    environment:
+      - "GF_SECURITY_ADMIN_PASSWORD=admin"
+    command: "bash"
+
+  # ==== LIGHTWEIGHT OPTIONS ====
+
   alpine-minimal:
     name: "🏔️ Alpine Minimal"
     image: "alpine:latest"
     volumes:
       - "${PWD}:/workspace"
-    command: "sh"
-    
+    command: "sh -c 'apk add --no-cache bash curl git && bash'"
+
   experimental:
-    name: "⚗️ Experimental Playground"
-    image: "debian:bookworm-slim"
-    volumes:
-      - "${PWD}:/workspace"
-      - "/tmp:/host-tmp"
-    environment:
-      - "TERM=xterm-256color"
-    command: "bash"
-    
-  homelab-toolkit:
-    name: "🏠 Homelab Command Center"
+    name: "⚗️ Quick Experiment"
     image: "ubuntu:22.04"
     volumes:
       - "${PWD}:/workspace"
-      - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
-      - "DEBIAN_FRONTEND=noninteractive"
       - "TERM=xterm-256color"
-    command: "bash -c 'apt update && apt install -y curl wget git docker.io portainer-ce-agent tailscale net-tools dnsutils && echo \"🏠 Homelab toolkit ready!\" && bash'"
-    
-  traefik-playground:
-    name: "🌐 Reverse Proxy Lab (Traefik)"
-    image: "traefik:v3.0"
-    ports:
-      - "8080:8080"
-      - "80:80"
-    volumes:
-      - "${PWD}:/workspace"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    command: "sh"
-    
-  ai-playground:
-    name: "🤖 AI/ML Playground"
-    image: "python:3.11"
+    command: "bash"
+
+  # ==== TRADITIONAL DEV (for when you need them) ====
+
+  python-learn:
+    name: "🐍 Python Learning"
+    image: "python:3.11-slim"
     volumes:
       - "${PWD}:/workspace"
     environment:
       - "PYTHONPATH=/workspace"
-    command: "bash -c 'pip install jupyter pandas numpy matplotlib ollama && echo \"🤖 AI playground ready!\" && bash'"
-    
-  web-dev-stack:
-    name: "🌍 Web Dev Stack (NGINX + PHP)"
-    image: "webdevops/php-nginx:8.2"
-    ports:
-      - "8000:80"
-    volumes:
-      - "${PWD}:/app"
-    environment:
-      - "WEB_DOCUMENT_ROOT=/app/public"
-    command: "bash"
-    
-  network-troubleshoot:
-    name: "🔧 Network Troubleshooting Tools"
-    image: "nicolaka/netshoot"
+    command: "bash -c 'pip install ipython jupyter requests && bash'"
+
+  rust-explore:
+    name: "🦀 Rust Exploration"
+    image: "rust:latest"
     volumes:
       - "${PWD}:/workspace"
+      - "${HOME}/.cargo:/usr/local/cargo"
     command: "bash"
+
+# ==== SYSTEM MANAGEMENT ====
+management:
+  cleanup:
+    name: "🧹 Container Cleanup"
+    description: "Remove unused containers and images"
+
+  running:
+    name: "📋 Show Running Containers"
+    description: "List currently active containers"
+
+  config:
+    name: "⚙️ Edit Configuration"
+    description: "Modify container definitions"
+
+  refresh:
+    name: "🔄 Update All Images"
+    description: "Pull latest versions of all container images"
