@@ -137,7 +137,6 @@ alias cpuinfo='lscpu'
 alias diskinfo='df -h'
 
 # Fun stuff
-alias weather='curl -s wttr.in'
 alias moon='curl -s wttr.in/Moon'
 alias myweather='curl -s wttr.in/$(curl -s ipinfo.io/city)'
 
@@ -156,7 +155,6 @@ alias pbpaste='echo "Override this in os-specific config"'
 # Quick config editing
 alias zshrc='$EDITOR $XDG_CONFIG_HOME/zsh/zshrc'
 alias aliases='$EDITOR $XDG_CONFIG_HOME/zsh/aliases.zsh'
-alias funcs='$EDITOR $XDG_CONFIG_HOME/zsh/functions.zsh'
 alias envs='$EDITOR $XDG_CONFIG_HOME/zsh/environment.zsh'
 
 # XDG-aware applications

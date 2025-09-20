@@ -85,33 +85,74 @@ mkdir -p "$XDG_STATE_HOME/less" \
 # EXTERNAL TOOL INTEGRATIONS
 # =============================================================================
 
-# Zoxide (smart cd) - with fallback to native cd
-if command -v zoxide >/dev/null 2>&1 && typeset -f compdef >/dev/null 2>&1; then
-  # Initialize zoxide without replacing cd
-  eval "$(zoxide init zsh)"
+# =============================================================================
+# SECURITY-SENSITIVE DIRECTORIES
+# =============================================================================
+# Set XDG defaults if not already defined
+: "${XDG_DATA_HOME:=$HOME/.local/share}"
+: "${XDG_CONFIG_HOME:=$HOME/.config}"
 
-  # Create a hybrid cd function that tries zoxide first, falls back to builtin cd
-  cd() {
-    if [[ $# -eq 0 ]]; then
-      # No arguments - go to home directory (standard cd behavior)
-      builtin cd
-    elif [[ -d "$1" ]] || [[ "$1" == "-" ]] || [[ "$1" =~ ^[-+][0-9]*$ ]]; then
-      # If it's a valid directory, dash (previous dir), or stack notation (+1, -2, etc.)
-      # Use builtin cd directly
-      builtin cd "$@"
-    else
-      # Try zoxide first for fuzzy matching
-      if __zoxide_z "$@" 2>/dev/null; then
-        return 0
-      else
-        # If zoxide fails, fall back to builtin cd
-        builtin cd "$@"
-      fi
-    fi
-  }
+# Lock down permissions
+[[ -d "$XDG_DATA_HOME/gnupg" ]]  && chmod 700 "$XDG_DATA_HOME/gnupg"
+[[ -d "$XDG_CONFIG_HOME/aws" ]]  && chmod 700 "$XDG_CONFIG_HOME/aws"
+
+# =============================================================================
+# COMPLETIONS
+# =============================================================================
+# make sure compdef exists before plugins or tools rely on it
+autoload -U compinit
+compinit
+
+# =============================================================================
+# PATH SETUP (Homebrew on Apple Silicon vs Intel)
+# =============================================================================
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  export PATH="/opt/homebrew/bin:$PATH"
+elif [[ -x /usr/local/bin/brew ]]; then
+  export PATH="/usr/local/bin:$PATH"
 fi
 
-# Direnv (project environments)
+# =============================================================================
+# ZOXIDE (smart cd with builtin fallback + debug)
+# =============================================================================
+# initialize zoxide
+eval "$(zoxide init zsh)"
+
+# hybrid cd: try builtin first for real dirs, else try zoxide, else fallback
+cd() {
+  if [[ $# -eq 0 ]]; then
+    echo "[cd] No args → builtin cd ~"
+    builtin cd
+    return
+  fi
+
+  # direct cases: real dir, previous dir (-), directory stack refs (+1, -2)
+  if [[ -d "$1" ]] || [[ "$1" == "-" ]] || [[ "$1" =~ ^[-+][0-9]*$ ]]; then
+    echo "[cd] Direct match → builtin cd $*"
+    builtin cd "$@"
+    return
+  fi
+
+  # try zoxide fuzzy jump
+  if typeset -f __zoxide_z >/dev/null 2>&1; then
+    if __zoxide_z "$@" 2>/dev/null; then
+      echo "[cd] zoxide matched → $*"
+      return
+    else
+      echo "[cd] zoxide had no match for: $*"
+    fi
+  else
+    echo "[cd] zoxide not initialized, falling back"
+  fi
+
+  # last resort: regular cd (will error if truly not a dir)
+  echo "[cd] Fallback → builtin cd $*"
+  builtin cd "$@"
+}
+
+# =============================================================================
+# DIRENV (per-project environments)
+# =============================================================================
 if command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook zsh)"
 fi
@@ -125,3 +166,4 @@ fi
 if [[ -z "$TERM" ]] || [[ "$TERM" == "ghostty" ]]; then
   export TERM="xterm-256color"
 fi
+=======
