@@ -71,6 +71,53 @@ chmod 644 ~/.zshrc
 chmod 644 ~/.zprofile
 chmod 644 ~/.tmux-cheatsheet.txt
 
+# Optional: Environment Launcher setup
+echo ""
+echo "🚀 Setting up Environment Launcher..."
+if command -v brew >/dev/null 2>&1; then
+    # Install Hammerspoon if not present
+    if ! command -v hammerspoon >/dev/null 2>&1 && ! [[ -d "/Applications/Hammerspoon.app" ]]; then
+        echo "  📦 Installing Hammerspoon..."
+        brew install hammerspoon --quiet
+    fi
+
+    # Install dependencies
+    deps_needed=()
+    command -v fzf >/dev/null 2>&1 || deps_needed+=(fzf)
+    command -v yq >/dev/null 2>&1 || deps_needed+=(yq)
+
+    if [[ ${#deps_needed[@]} -gt 0 ]]; then
+        echo "  📦 Installing environment launcher dependencies: ${deps_needed[*]}"
+        brew install "${deps_needed[@]}" --quiet
+    fi
+
+    # Set up Hammerspoon config if it doesn't exist
+    if [[ ! -f "$HOME/.hammerspoon/init.lua" ]]; then
+        echo "  ⚙️ Configuring Hammerspoon hotkeys..."
+        mkdir -p "$HOME/.hammerspoon"
+        [[ -f "environment-launcher/hammerspoon-setup.lua" ]] && \
+            cp environment-launcher/hammerspoon-setup.lua "$HOME/.hammerspoon/init.lua"
+    fi
+
+    # Set up environment launcher config
+    if [[ -d "environment-launcher" ]]; then
+        echo "  ⚙️ Setting up environment launcher..."
+        mkdir -p "$HOME/.config/dev-environments"
+        [[ -f "environment-launcher/containers.yaml" ]] && \
+            cp environment-launcher/containers.yaml "$HOME/.config/dev-environments/" 2>/dev/null || true
+
+        # Ensure dev-launcher is in place and executable
+        [[ -f "environment-launcher/dev-launcher" ]] && \
+            cp environment-launcher/dev-launcher "$HOME/.local/bin/" && \
+            chmod +x "$HOME/.local/bin/dev-launcher"
+    fi
+
+    echo "  ✓ Environment launcher configured"
+    echo "  💡 Use ⌘+Shift+D after starting Docker Desktop"
+else
+    echo "  ⚠️ Homebrew not found - skipping environment launcher setup"
+fi
+
 echo ""
 echo "🎉 Dotfiles installed successfully!"
 echo ""
@@ -78,10 +125,12 @@ echo "📋 Next steps:"
 echo "  1. Start a new terminal session"
 echo "  2. Launch tmux and run 'Ctrl-a + I' to install tmux plugins"
 echo "  3. Use 'Ctrl-a + C' for the tmux cheatsheet"
+echo "  4. Start Docker Desktop and try ⌘+Shift+D for environment launcher"
 echo ""
 echo "💡 Key features:"
 echo "  • tmux with homelab-optimized keybindings"
 echo "  • SSH config for infrastructure work"
 echo "  • Ghostty & Alacritty terminal configurations"
+echo "  • Environment launcher with ⌘+Shift+D hotkey"
 echo "  • Session persistence and restoration"
 echo "  • Catppuccin Mocha theme for both terminals"
