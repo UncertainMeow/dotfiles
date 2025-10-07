@@ -131,7 +131,13 @@ launch_container() {
     
     # Build docker command
     local docker_cmd="docker run -it --rm --name $name"
-    
+
+    # Add platform if specified (for Apple Silicon compatibility)
+    local platform=$(yq eval ".containers.${container_key}.platform?" "$CONTAINERS_CONFIG" 2>/dev/null || echo "null")
+    if [[ "$platform" != "null" && -n "$platform" ]]; then
+        docker_cmd+=" --platform $platform"
+    fi
+
     # Add volumes with environment variable expansion
     local volumes=$(yq eval ".containers.${container_key}.volumes[]?" "$CONTAINERS_CONFIG" 2>/dev/null || true)
     while IFS= read -r volume; do
@@ -223,8 +229,8 @@ main() {
     echo "║               Inspired by Jake@Linux                    ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}\n"
-    
-    check_deps "$1"
+
+    check_deps "${1:-}"
     
     local selection=$(show_menu)
     

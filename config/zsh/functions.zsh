@@ -1,10 +1,10 @@
-unalias -m "weather|funcs" 2>/dev/null
 #!/usr/bin/env zsh
 
 # Custom Functions - The "Lego Block" Approach
 
-# kill aliases that collide with function names
-unalias -m 'weather|funcs' 2>/dev/null
+# Kill any aliases that collide with function names
+# This prevents "defining function based on alias" errors
+unalias -m 'weather|funcs|mkcd|proj|serve' 2>/dev/null
 
 # === Directory Operations ===
 

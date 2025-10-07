@@ -32,8 +32,7 @@ alias .....='cd ../../../..'
 alias ~='cd ~'
 alias -- -='cd -'  # Go to previous directory
 
-# Make and change directory in one command
-alias mkcd='mkdir -p "$1" && cd "$1"'
+# Note: mkcd is defined as a function in functions.zsh for better error handling
 
 # Git aliases (short and sweet)
 alias g='git'
@@ -51,7 +50,7 @@ alias gpop='git stash pop'
 
 # Development shortcuts
 alias dev='cd $DEVELOPMENT_DIR'
-alias proj='cd $DEVELOPMENT_DIR'
+# Note: proj is defined as a function in functions.zsh for project management
 
 # Quick project navigation (you can customize these)
 alias pyproj='cd $DEVELOPMENT_DIR/python'
@@ -141,7 +140,7 @@ alias moon='curl -s wttr.in/Moon'
 alias myweather='curl -s wttr.in/$(curl -s ipinfo.io/city)'
 
 # Development server shortcuts (customize as needed)
-alias serve='python3 -m http.server'
+# Note: serve is defined as a function in functions.zsh with port argument support
 alias serve8080='python3 -m http.server 8080'
 
 # Text processing

@@ -4,13 +4,23 @@ A practical, modular terminal configuration optimized for homelab management and
 
 ## Quick Start
 
+### Personal Computer
 ```bash
 git clone https://github.com/UncertainMeow/dotfiles.git
 cd dotfiles
 ./install.sh
 ```
 
+### Work Computer (No Hammerspoon)
+```bash
+git clone https://github.com/UncertainMeow/dotfiles.git
+cd dotfiles
+./install-work.sh  # Work-safe mode, no special permissions required
+```
+
 The installer backs up your existing configs and sets everything up. Compatible with macOS, Arch Linux, NixOS, and Bazzite.
+
+**See [WORK-COMPUTER-SECURITY.md](WORK-COMPUTER-SECURITY.md) for security best practices.**
 
 ## What You Get
 
@@ -134,6 +144,20 @@ dotfiles/
 **Broke something?** Restore from `~/dotfiles_backup/TIMESTAMP/` or reinstall.
 
 **SSH issues?** The setup includes automatic TERM fixes for compatibility with remote servers.
+
+**Ghostty theme errors?** Run `./scripts/validate-ghostty-themes.sh` to check and auto-fix theme issues.
+
+**Zsh parse errors?** Run `./scripts/validate-zsh-config.sh` to check for common configuration problems.
+
+## Maintenance Scripts
+
+The `scripts/` directory includes helpful validation tools:
+
+- `validate-ghostty-themes.sh` - Checks if Ghostty themes exist and downloads missing ones
+- `validate-zsh-config.sh` - Detects alias/function conflicts and syntax errors
+- `backup-config.sh` - Manual backup of live configurations
+- `restore-config.sh` - Restore from backups
+- `sync-configs.sh` - Sync live changes back to repo
 
 ---
 

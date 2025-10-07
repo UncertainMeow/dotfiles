@@ -29,7 +29,10 @@ if [[ -d "$ZSH_CONFIG_DIR" ]]; then
   [[ -f "$ZSH_CONFIG_DIR/completion.zsh" ]] && source "$ZSH_CONFIG_DIR/completion.zsh"
   [[ -f "$ZSH_CONFIG_DIR/aliases.zsh" ]] && source "$ZSH_CONFIG_DIR/aliases.zsh"
   [[ -f "$ZSH_CONFIG_DIR/functions.zsh" ]] && source "$ZSH_CONFIG_DIR/functions.zsh"
-  
+
+  # Load Parallels integration (optional, only if Parallels is installed)
+  [[ -f "$ZSH_CONFIG_DIR/parallels-integration.zsh" ]] && source "$ZSH_CONFIG_DIR/parallels-integration.zsh"
+
   # OS-specific configurations
   case "$(uname -s)" in
     Darwin*)

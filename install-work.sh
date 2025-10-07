@@ -1,7 +1,7 @@
 #!/bin/bash
-# Dotfiles installer - modular terminal configuration
+# Work-safe dotfiles installer - no Hammerspoon, no special permissions required
 
-echo "🚀 Installing modern dotfiles..."
+echo "🏢 Installing work-safe dotfiles (no Hammerspoon)..."
 
 # Check if running on macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then
@@ -31,6 +31,7 @@ mkdir -p ~/.config/ghostty
 mkdir -p ~/.config/alacritty/themes
 mkdir -p ~/.ssh
 mkdir -p ~/.tmux/plugins
+mkdir -p ~/.local/bin
 
 # Install tmux plugin manager (TPM) if not present
 if [ ! -d ~/.tmux/plugins/tpm ]; then
@@ -82,26 +83,20 @@ if [[ -f scripts/validate-zsh-config.sh ]]; then
 fi
 
 # Set proper permissions
-chmod 644 ~/.ssh/config
+chmod 644 ~/.ssh/config 2>/dev/null || true
 chmod 644 ~/.config/ghostty/config 2>/dev/null || true
 chmod 644 ~/.config/alacritty/alacritty.toml 2>/dev/null || true
 chmod 644 ~/.config/alacritty/themes/catppuccin-mocha.toml 2>/dev/null || true
-chmod 644 ~/.tmux.conf
-chmod 644 ~/.zshrc
-chmod 644 ~/.zprofile
-chmod 644 ~/.tmux-cheatsheet.txt
+chmod 644 ~/.tmux.conf 2>/dev/null || true
+chmod 644 ~/.zshrc 2>/dev/null || true
+chmod 644 ~/.zprofile 2>/dev/null || true
+chmod 644 ~/.tmux-cheatsheet.txt 2>/dev/null || true
 
-# Optional: Environment Launcher setup
+# Environment Launcher setup (NO HAMMERSPOON)
 echo ""
-echo "🚀 Setting up Environment Launcher..."
+echo "🚀 Setting up Environment Launcher (work-safe mode)..."
 if command -v brew >/dev/null 2>&1; then
-    # Install Hammerspoon if not present
-    if ! command -v hammerspoon >/dev/null 2>&1 && ! [[ -d "/Applications/Hammerspoon.app" ]]; then
-        echo "  📦 Installing Hammerspoon..."
-        brew install hammerspoon --quiet
-    fi
-
-    # Install dependencies
+    # Install only the essential dependencies (NO Hammerspoon)
     deps_needed=()
     command -v fzf >/dev/null 2>&1 || deps_needed+=(fzf)
     command -v yq >/dev/null 2>&1 || deps_needed+=(yq)
@@ -109,14 +104,6 @@ if command -v brew >/dev/null 2>&1; then
     if [[ ${#deps_needed[@]} -gt 0 ]]; then
         echo "  📦 Installing environment launcher dependencies: ${deps_needed[*]}"
         brew install "${deps_needed[@]}" --quiet
-    fi
-
-    # Set up Hammerspoon config if it doesn't exist
-    if [[ ! -f "$HOME/.hammerspoon/init.lua" ]]; then
-        echo "  ⚙️ Configuring Hammerspoon hotkeys..."
-        mkdir -p "$HOME/.hammerspoon"
-        [[ -f "environment-launcher/hammerspoon-setup.lua" ]] && \
-            cp environment-launcher/hammerspoon-setup.lua "$HOME/.hammerspoon/init.lua"
     fi
 
     # Set up environment launcher config
@@ -131,26 +118,36 @@ if command -v brew >/dev/null 2>&1; then
             cp environment-launcher/dev-launcher "$HOME/.local/bin/" && \
             chmod +x "$HOME/.local/bin/dev-launcher"
     fi
-
-    echo "  ✓ Environment launcher configured"
-    echo "  💡 Use ⌘+Shift+D after starting Docker Desktop"
 else
-    echo "  ⚠️ Homebrew not found - skipping environment launcher setup"
+    echo "  ⚠️  Homebrew not found, skipping optional dependencies"
 fi
 
+# Add work-safe aliases for dev launcher
 echo ""
-echo "🎉 Dotfiles installed successfully!"
+echo "✅ Adding work-safe shell aliases..."
+cat >> ~/.zshrc.local << 'EOF'
+# Work-safe development environment aliases (no Hammerspoon required)
+alias dev='~/.local/bin/dev-launcher'
+alias dev-menu='~/.local/bin/dev-launcher'
+alias dev-clean='docker system prune -f && echo "Docker cleanup complete"'
+EOF
+chmod 644 ~/.zshrc.local
+
 echo ""
-echo "📋 Next steps:"
-echo "  1. Start a new terminal session"
-echo "  2. Launch tmux and run 'Ctrl-a + I' to install tmux plugins"
-echo "  3. Use 'Ctrl-a + C' for the tmux cheatsheet"
-echo "  4. Start Docker Desktop and try ⌘+Shift+D for environment launcher"
+echo "✅ Work-safe installation complete!"
 echo ""
-echo "💡 Key features:"
-echo "  • tmux with homelab-optimized keybindings"
-echo "  • SSH config for infrastructure work"
-echo "  • Ghostty & Alacritty terminal configurations"
-echo "  • Environment launcher with ⌘+Shift+D hotkey"
-echo "  • Session persistence and restoration"
-echo "  • Catppuccin Mocha theme for both terminals"
+echo "🎯 What's different from full install:"
+echo "  - No Hammerspoon (no Accessibility permissions required)"
+echo "  - Use 'dev' or 'dev-menu' command instead of ⌘+Shift+D hotkey"
+echo "  - All container/VM functionality intact"
+echo ""
+echo "📖 Next steps:"
+echo "  1. Restart your terminal or run: source ~/.zshrc"
+echo "  2. Type 'dev' to launch the environment menu"
+echo "  3. Check ~/.zshrc.local for additional work-specific customizations"
+echo ""
+echo "🔒 Security:"
+echo "  - No special macOS permissions required"
+echo "  - All containers run isolated"
+echo "  - Edit ~/.zshrc.local for machine-specific settings (not tracked in git)"
+echo ""
