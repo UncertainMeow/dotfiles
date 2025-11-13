@@ -106,16 +106,17 @@ show_menu() {
         "SYSTEM:refresh:🔄 Refresh Docker images"
     )
 
-    # Create the menu
+    # Create the menu - output full option line for parsing
     printf '%s\n' "${OPTIONS_CACHE[@]}" | \
-        sed 's/^[^:]*:[^:]*://' | \
         fzf \
             --prompt="🚀 Select Development Environment: " \
             --height=60% \
             --layout=reverse \
             --border=rounded \
             --border-label=" Environment Launcher " \
-            --preview='echo -e "🎯 {}\n\n📝 This will launch your selected environment\n⚡ Press ENTER to proceed\n🚫 Press ESC to cancel"' \
+            --with-nth=3.. \
+            --delimiter=':' \
+            --preview='echo -e "🎯 {3..}\n\n📝 This will launch your selected environment\n⚡ Press ENTER to proceed\n🚫 Press ESC to cancel"' \
             --preview-window=right:40% \
             --header="⌘+D Environment Launcher | Use ↑↓ to navigate, ENTER to select" \
             --color="border:#6272a4,header:#8be9fd,prompt:#50fa7b"
@@ -134,13 +135,7 @@ launch_container() {
     
     # Build docker command
     local docker_cmd="docker run -it --rm --name $name"
-
-    # Add platform if specified (for Apple Silicon compatibility)
-    local platform=$(yq eval ".containers.${container_key}.platform?" "$CONTAINERS_CONFIG" 2>/dev/null || echo "null")
-    if [[ "$platform" != "null" && -n "$platform" ]]; then
-        docker_cmd+=" --platform $platform"
-    fi
-
+    
     # Add volumes with environment variable expansion
     local volumes=$(yq eval ".containers.${container_key}.volumes[]?" "$CONTAINERS_CONFIG" 2>/dev/null || true)
     while IFS= read -r volume; do
@@ -240,29 +235,14 @@ main() {
 
     check_deps
 
-    local selection=$(show_menu)
-    
-    if [[ -z "$selection" ]]; then
+    local option_line=$(show_menu)
+
+    if [[ -z "$option_line" ]]; then
         echo -e "${YELLOW}🚫 No selection made${NC}"
         exit 0
     fi
 
-    # Parse selection dynamically from OPTIONS_CACHE
-    local option_line=""
-    for option in "${OPTIONS_CACHE[@]}"; do
-        # Extract display name (everything after second colon)
-        local display_name="${option#*:*:}"
-        if [[ "$display_name" == "$selection" ]]; then
-            option_line="$option"
-            break
-        fi
-    done
-
-    if [[ -z "$option_line" ]]; then
-        echo -e "${RED}❌ Could not find option for: $selection${NC}"
-        exit 1
-    fi
-
+    # Parse the option line directly (format: TYPE:KEY:NAME)
     local type=$(echo "$option_line" | cut -d':' -f1)
     local key=$(echo "$option_line" | cut -d':' -f2)
     
