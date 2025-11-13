@@ -6,7 +6,6 @@ containers:
     image: "nixos/nix:latest"
     volumes:
       - "${PWD}:/workspace"
-      - "${HOME}/.config:/home/nixuser/.config:ro"
     environment:
       - "NIX_PATH=nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz"
     command: "bash"
@@ -28,26 +27,6 @@ containers:
     environment:
       - "TERM=xterm-256color"
     command: "bash -c 'apt update && apt install -y git curl wget && bash'"
-
-  arch-dev:
-    name: "🏛️ Arch Linux Development"
-    image: "archlinux:latest"
-    platform: "linux/amd64"
-    volumes:
-      - "${PWD}:/workspace"
-    environment:
-      - "TERM=xterm-256color"
-    command: "bash -c 'pacman -Sy --noconfirm base-devel git curl wget vim neovim tmux htop zsh fzf ripgrep fd bat exa zoxide && zsh || bash'"
-
-  cachyos:
-    name: "⚡ CachyOS (Performance-Optimized Arch)"
-    image: "archlinux:latest"
-    platform: "linux/amd64"
-    volumes:
-      - "${PWD}:/workspace"
-    environment:
-      - "TERM=xterm-256color"
-    command: 'bash -c "pacman -Sy --noconfirm base-devel git curl wget vim zsh fzf && echo CachyOS base environment ready && zsh || bash"'
 
   bazzite-gaming:
     name: "🎮 Bazzite Gaming Environment"
@@ -97,10 +76,9 @@ containers:
     image: "ubuntu:22.04"
     volumes:
       - "${PWD}:/workspace"
-      - "${HOME}/.ssh:/root/.ssh:ro"
     environment:
       - "TERM=xterm-256color"
-    command: "bash -c 'apt update && apt install -y curl wget git htop ncdu tree jq ansible && wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 && chmod +x /usr/local/bin/yq && bash'"
+    command: "bash -c 'apt update && apt install -y curl wget git htop ncdu tree jq yq ansible && bash'"
 
   network-tools:
     name: "🌐 Network Analysis Lab"
@@ -152,7 +130,6 @@ containers:
     image: "rust:latest"
     volumes:
       - "${PWD}:/workspace"
-      - "${HOME}/.cargo:/usr/local/cargo"
     command: "bash"
 
 # ==== SYSTEM MANAGEMENT ====
