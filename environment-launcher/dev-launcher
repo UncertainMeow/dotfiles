@@ -238,8 +238,8 @@ main() {
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}\n"
 
-    check_deps "${1:-}"
-    
+    check_deps
+
     local selection=$(show_menu)
     
     if [[ -z "$selection" ]]; then
