@@ -12,11 +12,11 @@ fi
 # =============================================================================
 
 # Get the directory where config modules are located
-# Check if we're in the dotfiles repo or if configs are in ~/dotfiles-config
-if [[ -d "${${(%):-%x}:A:h}/config/zsh" ]]; then
-    ZSH_CONFIG_DIR="${${(%):-%x}:A:h}/config/zsh"
-elif [[ -d "$HOME/dotfiles-config/zsh" ]]; then
+# Prefer deployed config in ~/dotfiles-config over repo location
+if [[ -d "$HOME/dotfiles-config/zsh" ]]; then
     ZSH_CONFIG_DIR="$HOME/dotfiles-config/zsh"
+elif [[ -d "${${(%):-%x}:A:h}/config/zsh" ]]; then
+    ZSH_CONFIG_DIR="${${(%):-%x}:A:h}/config/zsh"
 else
     ZSH_CONFIG_DIR=""
 fi
