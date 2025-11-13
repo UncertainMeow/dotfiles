@@ -32,7 +32,8 @@ alias .....='cd ../../../..'
 alias ~='cd ~'
 alias -- -='cd -'  # Go to previous directory
 
-# Note: mkcd is defined as a function in functions.zsh for better error handling
+# Make and change directory in one command (function defined in functions.zsh)
+# alias mkcd removed to prevent conflict with function
 
 # Git aliases (short and sweet)
 alias g='git'
@@ -50,7 +51,7 @@ alias gpop='git stash pop'
 
 # Development shortcuts
 alias dev='cd $DEVELOPMENT_DIR'
-# Note: proj is defined as a function in functions.zsh for project management
+# alias proj removed to prevent conflict with proj function
 
 # Quick project navigation (you can customize these)
 alias pyproj='cd $DEVELOPMENT_DIR/python'
@@ -136,11 +137,12 @@ alias cpuinfo='lscpu'
 alias diskinfo='df -h'
 
 # Fun stuff
+# weather function defined in functions.zsh (supports city argument: weather [city])
 alias moon='curl -s wttr.in/Moon'
 alias myweather='curl -s wttr.in/$(curl -s ipinfo.io/city)'
 
 # Development server shortcuts (customize as needed)
-# Note: serve is defined as a function in functions.zsh with port argument support
+# serve function defined in functions.zsh (supports custom ports: serve [port])
 alias serve8080='python3 -m http.server 8080'
 
 # Text processing
@@ -154,6 +156,7 @@ alias pbpaste='echo "Override this in os-specific config"'
 # Quick config editing
 alias zshrc='$EDITOR $XDG_CONFIG_HOME/zsh/zshrc'
 alias aliases='$EDITOR $XDG_CONFIG_HOME/zsh/aliases.zsh'
+alias funcs='$EDITOR $XDG_CONFIG_HOME/zsh/functions.zsh'
 alias envs='$EDITOR $XDG_CONFIG_HOME/zsh/environment.zsh'
 
 # XDG-aware applications
