@@ -11,6 +11,24 @@ containers:
       - "NIX_PATH=nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz"
     command: "bash"
 
+  omarchy:
+    name: "🏛️ Omarchy (Arch-based Opinionated Setup)"
+    image: "archlinux:latest"
+    volumes:
+      - "${PWD}:/workspace"
+    environment:
+      - "TERM=xterm-256color"
+    command: "bash -c 'pacman -Sy --noconfirm git curl && bash'"
+
+  omakub:
+    name: "🟠 Omakub (37signals Opinionated Ubuntu)"
+    image: "ubuntu:24.04"
+    volumes:
+      - "${PWD}:/workspace"
+    environment:
+      - "TERM=xterm-256color"
+    command: "bash -c 'apt update && apt install -y git curl wget && bash'"
+
   arch-dev:
     name: "🏛️ Arch Linux Development"
     image: "archlinux:latest"
