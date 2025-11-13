@@ -17,6 +17,9 @@ NC='\033[0m'
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/dev-environments"
 CONTAINERS_CONFIG="$CONFIG_DIR/containers.yaml"
 
+# Global options cache for menu selection
+declare -a OPTIONS_CACHE
+
 # Check dependencies
 check_deps() {
     local deps=(fzf yq)
@@ -82,29 +85,29 @@ get_container_name() {
 
 # Main menu with fzf magic
 show_menu() {
-    local options=()
-    
+    OPTIONS_CACHE=()  # Reset global cache
+
     # Add containers
     while IFS= read -r container; do
         local name=$(get_container_name "$container")
-        options+=("CONTAINER:$container:$name")
+        OPTIONS_CACHE+=("CONTAINER:$container:$name")
     done < <(load_containers)
-    
+
     # Add VMs if available
     while IFS= read -r vm; do
-        [[ -n "$vm" ]] && options+=("VM:$vm:🖥️ $vm")
+        [[ -n "$vm" ]] && OPTIONS_CACHE+=("VM:$vm:🖥️ $vm")
     done < <(load_vms)
-    
+
     # Add special options
-    options+=(
+    OPTIONS_CACHE+=(
         "SYSTEM:cleanup:🧹 Cleanup unused containers"
         "SYSTEM:running:📋 Show running containers"
         "SYSTEM:config:⚙️ Edit configuration"
         "SYSTEM:refresh:🔄 Refresh Docker images"
     )
-    
+
     # Create the menu
-    printf '%s\n' "${options[@]}" | \
+    printf '%s\n' "${OPTIONS_CACHE[@]}" | \
         sed 's/^[^:]*:[^:]*://' | \
         fzf \
             --prompt="🚀 Select Development Environment: " \
@@ -142,8 +145,13 @@ launch_container() {
     local volumes=$(yq eval ".containers.${container_key}.volumes[]?" "$CONTAINERS_CONFIG" 2>/dev/null || true)
     while IFS= read -r volume; do
         if [[ -n "$volume" ]]; then
-            # Expand environment variables
-            volume=$(eval echo "$volume")
+            # Safe environment variable expansion (only $HOME, $PWD, $USER)
+            volume="${volume//\$HOME/$HOME}"
+            volume="${volume//\$PWD/$PWD}"
+            volume="${volume//\$USER/$USER}"
+            volume="${volume//\$\{HOME\}/$HOME}"
+            volume="${volume//\$\{PWD\}/$PWD}"
+            volume="${volume//\$\{USER\}/$USER}"
             docker_cmd+=" -v \"$volume\""
         fi
     done <<< "$volumes"
@@ -238,21 +246,23 @@ main() {
         echo -e "${YELLOW}🚫 No selection made${NC}"
         exit 0
     fi
-    
-    # Parse selection (find original option with the displayed name)
-    local option_line=$(printf '%s\n' \
-        "CONTAINER:python-dev:🐍 Python Development" \
-        "CONTAINER:node-dev:🟢 Node.js Development" \
-        "CONTAINER:rust-dev:🦀 Rust Development" \
-        "CONTAINER:test-env:🧪 Clean Test Environment" \
-        "CONTAINER:alpine-minimal:🏔️ Alpine Minimal" \
-        "CONTAINER:experimental:⚗️ Experimental Playground" \
-        "SYSTEM:cleanup:🧹 Cleanup unused containers" \
-        "SYSTEM:running:📋 Show running containers" \
-        "SYSTEM:config:⚙️ Edit configuration" \
-        "SYSTEM:refresh:🔄 Refresh Docker images" | \
-        grep ":$selection$")
-    
+
+    # Parse selection dynamically from OPTIONS_CACHE
+    local option_line=""
+    for option in "${OPTIONS_CACHE[@]}"; do
+        # Extract display name (everything after second colon)
+        local display_name="${option#*:*:}"
+        if [[ "$display_name" == "$selection" ]]; then
+            option_line="$option"
+            break
+        fi
+    done
+
+    if [[ -z "$option_line" ]]; then
+        echo -e "${RED}❌ Could not find option for: $selection${NC}"
+        exit 1
+    fi
+
     local type=$(echo "$option_line" | cut -d':' -f1)
     local key=$(echo "$option_line" | cut -d':' -f2)
     

@@ -23,6 +23,9 @@ fi
 
 # Load modular configurations
 if [[ -d "$ZSH_CONFIG_DIR" ]]; then
+  # Load utilities library first (used by other modules)
+  [[ -f "$ZSH_CONFIG_DIR/lib/utils.zsh" ]] && source "$ZSH_CONFIG_DIR/lib/utils.zsh"
+
   # Core configuration modules
   [[ -f "$ZSH_CONFIG_DIR/environment.zsh" ]] && source "$ZSH_CONFIG_DIR/environment.zsh"
   [[ -f "$ZSH_CONFIG_DIR/history.zsh" ]] && source "$ZSH_CONFIG_DIR/history.zsh"
@@ -87,6 +90,9 @@ zinit light hlissner/zsh-autopair
 # Load completions
 autoload -Uz compinit && compinit
 zinit cdreplay -q
+
+# Load custom keybindings (after plugins for smart Tab completion)
+[[ -f "$ZSH_CONFIG_DIR/keybindings.zsh" ]] && source "$ZSH_CONFIG_DIR/keybindings.zsh"
 
 # =============================================================================
 # COLORS & VISUAL (from your working config)  

@@ -105,11 +105,24 @@ Create new `.zsh` files in `config/zsh/` and add source lines to the main `.zshr
 
 ## Included Tools & Functions
 
+**Cheat Sheets & Discovery:**
+- `funcs` - List all custom functions (with search!)
+- `funcs <keyword>` - Search functions
+- `alias-help` - Complete aliases cheat sheet
+- `alias-search <keyword>` - Search aliases
+
 **Shell Functions:**
 - `mkcd <dir>` - Create and enter directory
 - `up [n]` - Navigate up n directories
 - `extract <file>` - Universal archive extractor
+- `zoxpath <query>` or `zp <query>` - Get zoxide path without changing directory (copies to clipboard!)
 - Git shortcuts and file operations
+
+**Scripts Library Integration:**
+- `scripts` - List all your scripts in `~/scripts`
+- `scripts <name>` - Run a specific script
+- `run-script` - Interactive fzf menu for scripts
+- `edit-script <name>` - Edit or create a script
 
 **Modern Replacements:**
 - `eza` instead of `ls` (icons, git integration)
