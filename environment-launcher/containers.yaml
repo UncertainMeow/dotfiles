@@ -78,7 +78,7 @@ containers:
       - "${PWD}:/workspace"
     environment:
       - "TERM=xterm-256color"
-    command: "bash -c 'apt update && apt install -y curl wget git htop ncdu tree jq yq ansible && bash'"
+    command: "bash -c 'apt update && apt install -y curl wget git htop ncdu tree jq ansible python3-pip && bash'"
 
   network-tools:
     name: "🌐 Network Analysis Lab"
