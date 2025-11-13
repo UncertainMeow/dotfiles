@@ -135,7 +135,19 @@ launch_container() {
     
     # Build docker command
     local docker_cmd="docker run -it --rm --name $name"
-    
+
+    # Add platform if specified (for ARM64 compatibility)
+    local platform=$(yq eval ".containers.${container_key}.platform?" "$CONTAINERS_CONFIG" 2>/dev/null)
+    if [[ "$platform" != "null" && -n "$platform" ]]; then
+        docker_cmd+=" --platform $platform"
+    fi
+
+    # Add privileged flag if specified
+    local privileged=$(yq eval ".containers.${container_key}.privileged?" "$CONTAINERS_CONFIG" 2>/dev/null)
+    if [[ "$privileged" == "true" ]]; then
+        docker_cmd+=" --privileged"
+    fi
+
     # Add volumes with environment variable expansion
     local volumes=$(yq eval ".containers.${container_key}.volumes[]?" "$CONTAINERS_CONFIG" 2>/dev/null || true)
     while IFS= read -r volume; do
@@ -150,11 +162,18 @@ launch_container() {
             docker_cmd+=" -v \"$volume\""
         fi
     done <<< "$volumes"
-    
-    # Add environment variables
+
+    # Add environment variables with safe expansion
     local envs=$(yq eval ".containers.${container_key}.environment[]?" "$CONTAINERS_CONFIG" 2>/dev/null || true)
     while IFS= read -r env; do
-        [[ -n "$env" ]] && docker_cmd+=" -e \"$env\""
+        if [[ -n "$env" ]]; then
+            # Expand common environment variables safely
+            env="${env//\$\{DISPLAY\}/${DISPLAY:-}}"
+            env="${env//\$DISPLAY/${DISPLAY:-}}"
+            env="${env//\$\{HOME\}/$HOME}"
+            env="${env//\$HOME/$HOME}"
+            docker_cmd+=" -e \"$env\""
+        fi
     done <<< "$envs"
     
     # Add image and command
@@ -232,6 +251,14 @@ main() {
     echo "║               Inspired by Jake@Linux                    ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}\n"
+
+    # Warn if running from home directory
+    if [[ "$PWD" == "$HOME" ]]; then
+        echo -e "${YELLOW}⚠️  Warning: Running from home directory${NC}"
+        echo -e "${YELLOW}   This will mount your entire home folder to containers!${NC}"
+        echo -e "${CYAN}💡 Better: cd to a project directory first${NC}"
+        echo -e "${CYAN}   Example: cd ~/Documents/projects && dev-launcher${NC}\n"
+    fi
 
     check_deps
 

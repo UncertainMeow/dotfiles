@@ -13,6 +13,7 @@ containers:
   omarchy:
     name: "🏛️ Omarchy (Arch-based Opinionated Setup)"
     image: "archlinux:latest"
+    platform: "linux/amd64"
     volumes:
       - "${PWD}:/workspace"
     environment:
@@ -33,9 +34,8 @@ containers:
     image: "fedora:latest"
     volumes:
       - "${PWD}:/workspace"
-      - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
     environment:
-      - "DISPLAY=${DISPLAY}"
+      - "TERM=xterm-256color"
     command: "bash"
 
   # ==== HOMELAB & INFRASTRUCTURE ====
