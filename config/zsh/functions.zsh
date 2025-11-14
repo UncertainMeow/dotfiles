@@ -359,99 +359,99 @@ timer() {
 
 # === Help Function ===
 
-# === White Whale Management ===
+# === Dotfiles Management ===
 
-# Find whale management script
-_find_whale_script() {
+# Find dotfiles management script
+_find_dot_script() {
     local locations=(
-        "${XDG_CONFIG_HOME:-$HOME/.config}/white-whale/whale-manage.sh"
-        "$HOME/.white-whale/whale-manage.sh"
-        "$HOME/xdg-white-whale-dotfiles/whale-manage.sh"
-        "$HOME/.dotfiles/whale-manage.sh"
+        "${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/dot-manage.sh"
+        "$HOME/dotfiles/scripts/dot-manage.sh"
+        "$HOME/.dotfiles/dot-manage.sh"
+        "$HOME/dotfiles/dot-manage.sh"
     )
-    
+
     for location in "${locations[@]}"; do
         if [[ -f "$location" ]]; then
             echo "$location"
             return 0
         fi
     done
-    
-    if command -v whale-manage.sh > /dev/null 2>&1; then
-        echo "whale-manage.sh"
+
+    if command -v dot-manage.sh > /dev/null 2>&1; then
+        echo "dot-manage.sh"
         return 0
     fi
-    
+
     return 1
 }
 
-# White Whale status check
-whale-status() {
-    local whale_script
-    if whale_script=$(_find_whale_script); then
-        "$whale_script" status
+# Dotfiles status check
+dot-status() {
+    local dot_script
+    if dot_script=$(_find_dot_script); then
+        "$dot_script" status
     else
-        echo "🐋 White Whale management not found"
-        echo "💡 Run 'bootstrap.sh' to set up your environment"
-        echo "   or check if whale-manage.sh is in your PATH"
+        echo "📦 Dotfiles management not found"
+        echo "💡 Run 'install.sh' to set up your environment"
+        echo "   or check if dot-manage.sh is in your PATH"
     fi
 }
 
-# White Whale system audit
-whale-audit() {
-    local whale_script
-    if whale_script=$(_find_whale_script); then
-        "$whale_script" audit
+# Dotfiles system audit
+dot-audit() {
+    local dot_script
+    if dot_script=$(_find_dot_script); then
+        "$dot_script" audit
     else
-        echo "🐋 White Whale management not found"
-        echo "💡 Run 'bootstrap.sh' to set up your environment"
+        echo "📦 Dotfiles management not found"
+        echo "💡 Run 'install.sh' to set up your environment"
     fi
 }
 
 # Sync with repository
-whale-sync() {
-    local whale_script
-    if whale_script=$(_find_whale_script); then
-        "$whale_script" sync
+dot-sync() {
+    local dot_script
+    if dot_script=$(_find_dot_script); then
+        "$dot_script" sync
     else
-        echo "🐋 White Whale management not found"
-        echo "💡 Run 'bootstrap.sh' to set up your environment"
+        echo "📦 Dotfiles management not found"
+        echo "💡 Run 'install.sh' to set up your environment"
     fi
 }
 
 # Update system
-whale-update() {
-    local whale_script
+dot-update() {
+    local dot_script
     local dry_run_flag=""
     [[ "$1" == "--dry-run" ]] && dry_run_flag="--dry-run"
-    
-    if whale_script=$(_find_whale_script); then
-        "$whale_script" update $dry_run_flag
+
+    if dot_script=$(_find_dot_script); then
+        "$dot_script" update $dry_run_flag
     else
-        echo "🐋 White Whale management not found"
-        echo "💡 Run 'bootstrap.sh' to set up your environment"
+        echo "📦 Dotfiles management not found"
+        echo "💡 Run 'install.sh' to set up your environment"
     fi
 }
 
 # Show differences
-whale-diff() {
-    local whale_script
-    if whale_script=$(_find_whale_script); then
-        "$whale_script" diff
+dot-diff() {
+    local dot_script
+    if dot_script=$(_find_dot_script); then
+        "$dot_script" diff
     else
-        echo "🐋 White Whale management not found"
-        echo "💡 Run 'bootstrap.sh' to set up your environment"
+        echo "📦 Dotfiles management not found"
+        echo "💡 Run 'install.sh' to set up your environment"
     fi
 }
 
 # Complete health check
-whale-health() {
-    local whale_script
-    if whale_script=$(_find_whale_script); then
-        "$whale_script" health
+dot-health() {
+    local dot_script
+    if dot_script=$(_find_dot_script); then
+        "$dot_script" health
     else
-        echo "🐋 White Whale management not found"
-        echo "💡 Run 'bootstrap.sh' to set up your environment"
+        echo "📦 Dotfiles management not found"
+        echo "💡 Run 'install.sh' to set up your environment"
     fi
 }
 
@@ -459,13 +459,13 @@ whale-health() {
 funcs() {
     echo "Available custom functions:"
     echo
-    echo "🐋 White Whale Management:"
-    echo "  whale-status   - System health dashboard"
-    echo "  whale-audit    - Full XDG compliance audit"
-    echo "  whale-sync     - Pull latest from repository"
-    echo "  whale-diff     - Show differences from repo"
-    echo "  whale-update   - Apply repository updates"
-    echo "  whale-health   - Complete health check"
+    echo "📦 Dotfiles Management:"
+    echo "  dot-status   - System health dashboard"
+    echo "  dot-audit    - Full XDG compliance audit"
+    echo "  dot-sync     - Pull latest from repository"
+    echo "  dot-diff     - Show differences from repo"
+    echo "  dot-update   - Apply repository updates"
+    echo "  dot-health   - Complete health check"
     echo
     echo "📁 Directory:"
     echo "  mkcd <dir>     - Make and cd to directory"
