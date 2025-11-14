@@ -1,0 +1,62 @@
+#cloud-config
+# =============================================================================
+# Tailscale Auto-Provisioning Cloud-Init Template
+# =============================================================================
+# Use this with Proxmox, AWS, GCP, Azure, etc.
+# VM will automatically join your Tailnet on first boot
+
+# Set hostname
+hostname: my-server
+
+# Install packages
+packages:
+  - curl
+  - git
+  - vim
+
+# Run on first boot
+runcmd:
+  # Install Tailscale
+  - curl -fsSL https://tailscale.com/install.sh | sh
+
+  # Authenticate with Tailnet (replace YOUR_AUTH_KEY)
+  - |
+    tailscale up \
+      --authkey=YOUR_AUTH_KEY_HERE \
+      --hostname=my-server \
+      --advertise-tags=tag:server,tag:cloud-init \
+      --ssh
+
+  # Install portable dotfiles (optional but awesome!)
+  - curl -fsSL https://raw.githubusercontent.com/UncertainMeow/dotfiles/main/bootstrap-portable.sh | bash
+
+  # Set timezone
+  - timedatectl set-timezone America/Los_Angeles
+
+# Write files
+write_files:
+  - path: /etc/motd
+    content: |
+      ╔══════════════════════════════════════════════════════════╗
+      ║        🔷 Tailscale-Enabled Server                     ║
+      ║        Auto-provisioned via cloud-init                 ║
+      ╚══════════════════════════════════════════════════════════╝
+
+      This server is connected to your Tailnet!
+      Use 'tailscale status' to see your connection.
+
+# Optional: Users
+users:
+  - name: kellen
+    groups: [sudo, docker]
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/zsh
+    ssh_authorized_keys:
+      - YOUR_SSH_PUBLIC_KEY_HERE
+
+# Reboot after setup
+power_state:
+  mode: reboot
+  message: "Tailscale provisioning complete - rebooting"
+  timeout: 60
+  condition: True

@@ -1,0 +1,137 @@
+version: '3.8'
+
+# =============================================================================
+# Tailscale Sidecar Pattern
+# =============================================================================
+# Run any service on your Tailnet without modifying it
+# Each service gets its own Tailscale identity
+
+services:
+  # Example: Web application on Tailnet
+  webapp-tailscale:
+    image: tailscale/tailscale:latest
+    hostname: my-webapp
+    environment:
+      - TS_AUTHKEY=${TAILSCALE_AUTHKEY}  # Set in .env file
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_HOSTNAME=my-webapp
+      - TS_EXTRA_ARGS=--advertise-tags=tag:container,tag:webapp --ssh
+    volumes:
+      - tailscale-webapp:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+    networks:
+      - tailnet
+
+  # Your actual web application
+  webapp:
+    image: nginx:alpine
+    depends_on:
+      - webapp-tailscale
+    network_mode: service:webapp-tailscale  # Share network with Tailscale
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+  # Example: Database on Tailnet (private access only)
+  database-tailscale:
+    image: tailscale/tailscale:latest
+    hostname: my-database
+    environment:
+      - TS_AUTHKEY=${TAILSCALE_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_HOSTNAME=my-database
+      - TS_EXTRA_ARGS=--advertise-tags=tag:container,tag:database
+    volumes:
+      - tailscale-database:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+    networks:
+      - tailnet
+
+  database:
+    image: postgres:15-alpine
+    depends_on:
+      - database-tailscale
+    network_mode: service:database-tailscale
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=myapp
+      - POSTGRES_DB=myapp
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Example: Monitoring stack on Tailnet
+  grafana-tailscale:
+    image: tailscale/tailscale:latest
+    hostname: grafana
+    environment:
+      - TS_AUTHKEY=${TAILSCALE_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_HOSTNAME=grafana
+      - TS_EXTRA_ARGS=--advertise-tags=tag:container,tag:monitoring --ssh
+    volumes:
+      - tailscale-grafana:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    depends_on:
+      - grafana-tailscale
+    network_mode: service:grafana-tailscale
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SERVER_ROOT_URL=https://grafana
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  tailscale-webapp:
+  tailscale-database:
+  tailscale-grafana:
+  postgres-data:
+  grafana-data:
+
+networks:
+  tailnet:
+    driver: bridge
+
+# =============================================================================
+# USAGE
+# =============================================================================
+# 1. Create .env file with:
+#    TAILSCALE_AUTHKEY=tskey-auth-xxxxx
+#    DB_PASSWORD=secure_password
+#    GRAFANA_PASSWORD=secure_password
+#
+# 2. Generate auth key at: https://login.tailscale.com/admin/settings/keys
+#    - Check "Reusable" and "Ephemeral" (for containers)
+#    - Add appropriate tags if using ACLs
+#
+# 3. Deploy:
+#    docker-compose up -d
+#
+# 4. Access from any Tailnet device:
+#    http://my-webapp
+#    postgres://my-database:5432
+#    http://grafana
+#
+# 5. SSH into containers (if --ssh enabled):
+#    ssh my-webapp
+#
+# =============================================================================
