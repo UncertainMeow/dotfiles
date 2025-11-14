@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# =============================================================================
+# DOTLETS - Portable Dotfiles Quick Bootstrap
+# =============================================================================
+# Short, memorable command to deploy dotfiles anywhere
+#
+# Usage:
+#   dotlets              # Bootstrap current machine
+#   dotlets user@server  # Bootstrap remote machine
+
+set -euo pipefail
+
+BOOTSTRAP_URL="https://raw.githubusercontent.com/UncertainMeow/dotfiles/main/bootstrap-portable.sh"
+
+# Colors
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+if [[ $# -eq 0 ]]; then
+    # Bootstrap current machine
+    echo -e "${BLUE}📦 Bootstrapping dotfiles on local machine...${NC}"
+    curl -fsSL "$BOOTSTRAP_URL" | bash
+else
+    # Bootstrap remote machine
+    REMOTE="$1"
+    echo -e "${BLUE}📦 Bootstrapping dotfiles on ${GREEN}${REMOTE}${NC}..."
+    ssh "$REMOTE" "curl -fsSL $BOOTSTRAP_URL | bash"
+    echo -e "${GREEN}✅ Done! SSH in and type 'exec zsh' to activate${NC}"
+fi
