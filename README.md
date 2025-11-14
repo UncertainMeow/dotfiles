@@ -22,6 +22,28 @@ The installer backs up your existing configs and sets everything up. Compatible 
 
 **See [WORK-COMPUTER-SECURITY.md](WORK-COMPUTER-SECURITY.md) for security best practices.**
 
+### Remote Servers (Portable Dotfiles)
+```bash
+# One command - works anywhere!
+curl -fsSL https://raw.githubusercontent.com/UncertainMeow/dotfiles/main/bootstrap-portable.sh | bash
+
+# Or use the helper
+dotlets user@server
+```
+
+Never cry about `ll` not working on remote servers again! See [POKEMON-QUICK-REF.md](POKEMON-QUICK-REF.md) for details.
+
+## ⚡ Bonus: Pokemon-Themed Provisioning Tools
+
+**"Gotta provision 'em all!"** - Automatic Tailscale provisioning with style.
+
+- 🔴 **pokeball.sh** - Capture servers locally
+- ⚫ **master-ball.sh** - Capture remote servers (never fails!)
+- ⚡ **choose-you.sh** - Generate auto-provisioning VMs
+- ⚡ **go-dockahu.sh** - Containerize services on Tailnet
+
+See [scripts/tailscale/README.md](scripts/tailscale/README.md) for full Pokemon adventure!
+
 ## What You Get
 
 ### Terminal Emulator Support
