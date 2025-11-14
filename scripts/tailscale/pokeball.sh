@@ -27,6 +27,13 @@ REGISTER_DNS=false
 NETBOX_URL="${NETBOX_URL:-}"
 NETBOX_TOKEN="${NETBOX_TOKEN:-}"
 
+# Detect if running as root (no sudo needed)
+if [[ $EUID -eq 0 ]]; then
+    SUDO=""
+else
+    SUDO="sudo"
+fi
+
 # Show usage
 usage() {
     cat << EOF
@@ -151,8 +158,8 @@ install_tailscale() {
             curl -fsSL https://tailscale.com/install.sh | sh
             ;;
         arch)
-            sudo pacman -Sy --noconfirm tailscale
-            sudo systemctl enable --now tailscaled
+            $SUDO pacman -Sy --noconfirm tailscale
+            $SUDO systemctl enable --now tailscaled
             ;;
         *)
             echo -e "${RED}✗${NC} Unsupported OS: $OS"
@@ -169,7 +176,7 @@ authenticate() {
     echo -e "${BLUE}ℹ${NC}  Authenticating with Tailnet..."
 
     # Build tailscale up command
-    local cmd="sudo tailscale up"
+    local cmd="$SUDO tailscale up"
 
     # Add authkey if provided
     if [[ -n "$TAILSCALE_AUTHKEY" ]]; then
