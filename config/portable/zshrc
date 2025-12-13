@@ -1,68 +1,172 @@
-#!/usr/bin/env zsh
 # =============================================================================
-# PORTABLE DOTFILES - Minimal Remote Setup
+# HOMELAB DOTFILES - Modular Terminal Setup
 # =============================================================================
-# Ultra-lightweight config for SSH sessions
-# Zero dependencies - works on any Linux server
 
-# XDG Base Directory (if not set)
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-
-# Essential environment
-export EDITOR="${EDITOR:-vim}"
-export VISUAL="$EDITOR"
-export PAGER="less"
-
-# History configuration
-HISTFILE="${XDG_DATA_HOME}/zsh/history"
-HISTSIZE=10000
-SAVEHIST=$HISTSIZE
-mkdir -p "$(dirname "$HISTFILE")"
-
-# Shell options (fast, no plugins needed)
-setopt auto_cd              # Type directory name to cd
-setopt extended_glob        # Enhanced pattern matching
-setopt no_beep              # No annoying beeps
-setopt auto_pushd           # Make cd push old directory to stack
-setopt pushd_ignore_dups    # Don't push dupes
-setopt hist_ignore_space    # Ignore commands starting with space
-setopt hist_ignore_all_dups # Remove older dups
-setopt share_history        # Share history between sessions
-setopt inc_append_history   # Add commands immediately
-
-# PATH additions (if they exist)
-[[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
-
-# Load portable configs
-DOTFILES_DIR="${HOME}/.dotfiles"
-[[ -f "$DOTFILES_DIR/config/portable/aliases.zsh" ]] && source "$DOTFILES_DIR/config/portable/aliases.zsh"
-[[ -f "$DOTFILES_DIR/config/portable/functions.zsh" ]] && source "$DOTFILES_DIR/config/portable/functions.zsh"
-
-# Minimal prompt (fast, no dependencies)
-# Shows: user@host:~/path$
-autoload -U colors && colors
-PROMPT='%F{cyan}%n@%m%f:%F{blue}%~%f$ '
-
-# Git prompt (if in git repo)
-autoload -Uz vcs_info
-zstyle ':vcs_info:*' enable git
-zstyle ':vcs_info:git:*' formats ' %F{yellow}[%b]%f'
-precmd() { vcs_info }
-setopt prompt_subst
-PROMPT='%F{cyan}%n@%m%f:%F{blue}%~%f${vcs_info_msg_0_}$ '
-
-# Basic completion (no plugins needed)
-autoload -Uz compinit
-if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
-    compinit
-else
-    compinit -C
+# Instant prompt for Powerlevel10k
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Completion options
-zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
-echo "📦 Portable dotfiles loaded - use 'dotpull' to update"
+# =============================================================================
+# MODULAR CONFIG LOADING
+# =============================================================================
+
+# Get the directory where config modules are located
+# Prefer deployed config in ~/dotfiles-config over repo location
+if [[ -d "$HOME/dotfiles-config/zsh" ]]; then
+    ZSH_CONFIG_DIR="$HOME/dotfiles-config/zsh"
+elif [[ -d "${${(%):-%x}:A:h}/config/zsh" ]]; then
+    ZSH_CONFIG_DIR="${${(%):-%x}:A:h}/config/zsh"
+else
+    ZSH_CONFIG_DIR=""
+fi
+
+# Load modular configurations
+if [[ -d "$ZSH_CONFIG_DIR" ]]; then
+  # Load utilities library first (used by other modules)
+  [[ -f "$ZSH_CONFIG_DIR/lib/utils.zsh" ]] && source "$ZSH_CONFIG_DIR/lib/utils.zsh"
+
+  # Core configuration modules
+  [[ -f "$ZSH_CONFIG_DIR/environment.zsh" ]] && source "$ZSH_CONFIG_DIR/environment.zsh"
+  [[ -f "$ZSH_CONFIG_DIR/history.zsh" ]] && source "$ZSH_CONFIG_DIR/history.zsh"
+  [[ -f "$ZSH_CONFIG_DIR/completion.zsh" ]] && source "$ZSH_CONFIG_DIR/completion.zsh"
+  [[ -f "$ZSH_CONFIG_DIR/aliases.zsh" ]] && source "$ZSH_CONFIG_DIR/aliases.zsh"
+  [[ -f "$ZSH_CONFIG_DIR/functions.zsh" ]] && source "$ZSH_CONFIG_DIR/functions.zsh"
+  
+  # OS-specific configurations
+  case "$(uname -s)" in
+    Darwin*)
+      [[ -f "$ZSH_CONFIG_DIR/os/macos.zsh" ]] && source "$ZSH_CONFIG_DIR/os/macos.zsh"
+      ;;
+    Linux*)
+      # Detect specific Linux distributions
+      if [[ -f /etc/arch-release ]]; then
+        [[ -f "$ZSH_CONFIG_DIR/os/arch.zsh" ]] && source "$ZSH_CONFIG_DIR/os/arch.zsh"
+      elif [[ -f /etc/fedora-release ]] && grep -q "Bazzite" /etc/os-release 2>/dev/null; then
+        [[ -f "$ZSH_CONFIG_DIR/os/bazzite.zsh" ]] && source "$ZSH_CONFIG_DIR/os/bazzite.zsh"
+      elif [[ -f /etc/NIXOS ]]; then
+        [[ -f "$ZSH_CONFIG_DIR/os/nixos.zsh" ]] && source "$ZSH_CONFIG_DIR/os/nixos.zsh"
+      fi
+      ;;
+  esac
+fi
+
+# =============================================================================
+# SHELL OPTIONS & BEHAVIOR (from your working config)
+# =============================================================================
+setopt auto_cd extended_glob no_beep correct_all interactive_comments
+setopt auto_pushd pushd_ignore_dups pushd_minus
+
+# =============================================================================
+# ZINIT PLUGIN MANAGER (from your working config)
+# =============================================================================
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+if [ ! -d "$ZINIT_HOME" ]; then
+  mkdir -p "$(dirname "$ZINIT_HOME")"
+  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+fi
+source "$ZINIT_HOME/zinit.zsh"
+
+# =============================================================================
+# ZINIT PLUGINS (from your working config)
+# =============================================================================
+
+# Load powerlevel10k theme
+zinit ice depth"1"
+zinit load romkatv/powerlevel10k
+
+# Essential plugins for infrastructure work
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-completions
+
+# Additional useful plugins
+zinit light Aloxaf/fzf-tab
+zinit light hlissner/zsh-autopair
+
+# Load completions
+autoload -Uz compinit && compinit
+zinit cdreplay -q
+
+# Load custom keybindings (after plugins for smart Tab completion)
+[[ -f "$ZSH_CONFIG_DIR/keybindings.zsh" ]] && source "$ZSH_CONFIG_DIR/keybindings.zsh"
+
+# =============================================================================
+# COLORS & VISUAL (from your working config)  
+# =============================================================================
+if command -v vivid >/dev/null 2>&1; then
+  export LS_COLORS="$(vivid generate catppuccin-mocha)"
+elif command -v gdircolors >/dev/null 2>&1; then
+  eval "$(gdircolors -b 2>/dev/null || true)"
+fi
+
+# =============================================================================
+# FINAL CONFIGURATIONS
+# =============================================================================
+
+# Load prompt configuration if it exists
+[[ -f "$ZSH_CONFIG_DIR/prompt.zsh" ]] && source "$ZSH_CONFIG_DIR/prompt.zsh"
+
+# Load any local customizations (not tracked in git)
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Personal scripts library
+export PATH="$HOME/scripts/bin:$PATH"
+
+# Khoj utilities
+alias khoj-claude-backup='khoj-export-claude --all --watch'
+khoj-claude-saveas() {
+    local name="${1:-claude-$(date +%Y%m%d-%H%M%S)}"
+    khoj-export-claude --current "$name" --watch
+}
+
+khoj\?() {
+    cat << 'HELP'
+Claude Code Conversations
+
+  | Command                             | What it does                       |
+  |-------------------------------------|------------------------------------|
+  | khoj-export-claude --list           | List all Claude Code sessions      |
+  | khoj-export-claude --current "name" | Export current/most recent session |
+  | khoj-export-claude --recent N       | Export last N sessions             |
+  | khoj-export-claude --all            | Export all sessions                |
+  | khoj-export-claude <id> "name"      | Export specific session by ID      |
+  |                                     |                                    |
+  | Add --watch to any command above to continue monitoring for changes     |
+
+Terminal History (shell commands you ran)
+
+  | Command                         | What it does                         |
+  |---------------------------------|--------------------------------------|
+  | khoj-capture "name" "desc"      | Snapshot terminal history to md      |
+  | khoj-capture-select start "topic" | Start recording terminal           |
+  | khoj-capture-select mark "note"   | Mark an important moment           |
+  | khoj-capture-select stop          | Stop recording and save            |
+  | khoj-capture-select status        | Check if recording                 |
+
+Sync to Khoj
+
+  | Command           | What it does                            |
+  |-------------------|-----------------------------------------|
+  | khoj-sync         | One-time sync to Khoj                   |
+  | khoj-sync --watch | Continuous sync (watches for new files) |
+
+Shortcuts
+
+  | Alias               | Expands to                              |
+  |---------------------|-----------------------------------------|
+  | khoj-claude-backup  | khoj-export-claude --all --watch        |
+  | khoj-claude-saveas  | khoj-export-claude --current <name> --watch |
+  | khoj?               | Show this help                          |
+
+Quick reference:
+  - Claude conversations → khoj-export-claude
+  - Terminal commands → khoj-capture or khoj-capture-select
+  - Push to Khoj → khoj-sync
+HELP
+}
