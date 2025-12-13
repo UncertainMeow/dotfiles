@@ -119,11 +119,12 @@ fi
 export PATH="$HOME/scripts/bin:$PATH"
 
 # Khoj utilities
-alias khoj-claude-backup='khoj-export-claude --all --watch'
+alias khoj-claude-backup='khoj-export-claude --all --sync'
 khoj-claude-saveas() {
     local name="${1:-claude-$(date +%Y%m%d-%H%M%S)}"
-    khoj-export-claude --current "$name" --watch
+    khoj-export-claude --current "$name" --sync
 }
+alias khoj-save='khoj-export-claude --current --sync'
 
 khoj-help() {
     cat << 'HELP'
@@ -137,7 +138,7 @@ Claude Code Conversations
   | khoj-export-claude --all            | Export all sessions                |
   | khoj-export-claude <id> "name"      | Export specific session by ID      |
   |                                     |                                    |
-  | Add --watch to any command above to continue monitoring for changes     |
+  | Add --watch to monitor for changes, --sync to push to Khoj immediately  |
 
 Terminal History (shell commands you ran)
 
@@ -155,18 +156,20 @@ Sync to Khoj
   |-------------------|-----------------------------------------|
   | khoj-sync         | One-time sync to Khoj                   |
   | khoj-sync --watch | Continuous sync (watches for new files) |
+  | khoj-sync --reset | Re-upload all files (clear tracker)     |
 
 Shortcuts
 
   | Alias               | Expands to                              |
   |---------------------|-----------------------------------------|
-  | khoj-claude-backup  | khoj-export-claude --all --watch        |
-  | khoj-claude-saveas  | khoj-export-claude --current <name> --watch |
+  | khoj-save           | khoj-export-claude --current --sync     |
+  | khoj-claude-saveas  | khoj-export-claude --current <name> --sync |
+  | khoj-claude-backup  | khoj-export-claude --all --sync         |
   | khoj-help           | Show this help                          |
 
 Quick reference:
-  - Claude conversations → khoj-export-claude
-  - Terminal commands → khoj-capture or khoj-capture-select
-  - Push to Khoj → khoj-sync
+  - Save current session → khoj-save (or khoj-claude-saveas "name")
+  - Backup all sessions → khoj-claude-backup
+  - Manual sync → khoj-sync
 HELP
 }
