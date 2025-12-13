@@ -120,7 +120,7 @@ export PATH="$HOME/scripts/bin:$PATH"
 
 # Session capture utilities (saves to Obsidian vault)
 export OBSIDIAN_VAULT="$HOME/_vaults/ai-dev"
-export CLAUDE_EXPORT_DIR="$HOME/khoj-data/inbox/claude-sessions"
+export CLAUDE_EXPORT_DIR="$HOME/.local/share/claude-exports"
 export CLAUDE_BACKUP_DIR="$HOME/Backups/claude-sessions"
 
 alias claude-save-all='claude-export --all --sync'
