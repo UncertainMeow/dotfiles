@@ -120,13 +120,24 @@ export PATH="$HOME/scripts/bin:$PATH"
 
 # Session capture utilities (saves to Obsidian vault)
 export OBSIDIAN_VAULT="$HOME/_vaults/ai-dev"
+export CLAUDE_EXPORT_DIR="$HOME/khoj-data/inbox/claude-sessions"
+export CLAUDE_BACKUP_DIR="$HOME/Backups/claude-sessions"
 
-alias claude-backup='claude-export --all --sync'
+alias claude-save-all='claude-export --all --sync'
 claude-saveas() {
     local name="${1:-claude-$(date +%Y%m%d-%H%M%S)}"
     claude-export --current "$name" --sync
 }
 alias claude-save='claude-export --current --sync'
+
+# Backup to pristine folder (for Google Drive/NAS sync)
+claude-backup() {
+    mkdir -p "$CLAUDE_BACKUP_DIR"
+    echo "[INFO] Backing up to $CLAUDE_BACKUP_DIR..."
+    cp -r "$CLAUDE_EXPORT_DIR"/*.md "$CLAUDE_BACKUP_DIR/" 2>/dev/null || true
+    local count=$(ls -1 "$CLAUDE_BACKUP_DIR"/*.md 2>/dev/null | wc -l | tr -d ' ')
+    echo "[OK] Backed up $count files to $CLAUDE_BACKUP_DIR"
+}
 
 capture-help() {
     cat << 'HELP'
@@ -159,15 +170,19 @@ Sync to Obsidian Vault
 
 Shortcuts
 
-  | Alias          | What it does                               |
-  |----------------|--------------------------------------------|
-  | claude-save    | Export current session + sync to Obsidian  |
-  | claude-saveas  | Export with custom name + sync             |
-  | claude-backup  | Export all sessions + sync                 |
-  | capture-help   | Show this help                             |
+  | Alias           | What it does                               |
+  |-----------------|--------------------------------------------|
+  | claude-save     | Export current session + sync to Obsidian  |
+  | claude-saveas   | Export with custom name + sync             |
+  | claude-save-all | Export all sessions + sync to Obsidian     |
+  | claude-backup   | Copy exports to pristine backup folder     |
+  | capture-help    | Show this help                             |
 
-Vault location: ~/\_vaults/ai-dev/
-  - Claude Sessions/    ← Claude Code exports
-  - Terminal Captures/  ← Terminal history
+Locations:
+  Obsidian vault: ~/\_vaults/ai-dev/
+    - Claude Sessions/    ← Claude Code exports
+    - Terminal Captures/  ← Terminal history
+  Backup folder: ~/Backups/claude-sessions/
+    - Pristine copies for Google Drive/NAS sync
 HELP
 }
