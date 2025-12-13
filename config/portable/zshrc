@@ -118,58 +118,56 @@ fi
 # Personal scripts library
 export PATH="$HOME/scripts/bin:$PATH"
 
-# Khoj utilities
-alias khoj-claude-backup='khoj-export-claude --all --sync'
-khoj-claude-saveas() {
+# Session capture utilities (saves to Obsidian vault)
+export OBSIDIAN_VAULT="$HOME/_vaults/ai-dev"
+
+alias claude-backup='claude-export --all --sync'
+claude-saveas() {
     local name="${1:-claude-$(date +%Y%m%d-%H%M%S)}"
-    khoj-export-claude --current "$name" --sync
+    claude-export --current "$name" --sync
 }
-alias khoj-save='khoj-export-claude --current --sync'
+alias claude-save='claude-export --current --sync'
 
-khoj-help() {
+capture-help() {
     cat << 'HELP'
-Claude Code Conversations
+Claude Code Sessions → Obsidian
 
-  | Command                             | What it does                       |
-  |-------------------------------------|------------------------------------|
-  | khoj-export-claude --list           | List all Claude Code sessions      |
-  | khoj-export-claude --current "name" | Export current/most recent session |
-  | khoj-export-claude --recent N       | Export last N sessions             |
-  | khoj-export-claude --all            | Export all sessions                |
-  | khoj-export-claude <id> "name"      | Export specific session by ID      |
-  |                                     |                                    |
-  | Add --watch to monitor for changes, --sync to push to Khoj immediately  |
+  | Command                        | What it does                       |
+  |--------------------------------|------------------------------------|
+  | claude-export --list           | List all Claude Code sessions      |
+  | claude-export --current "name" | Export current/most recent session |
+  | claude-export --recent N       | Export last N sessions             |
+  | claude-export --all            | Export all sessions                |
+  |                                |                                    |
+  | Add --sync to copy to Obsidian vault                                 |
 
-Terminal History (shell commands you ran)
+Terminal History → Obsidian
 
-  | Command                         | What it does                         |
-  |---------------------------------|--------------------------------------|
-  | khoj-capture "name" "desc"      | Snapshot terminal history to md      |
-  | khoj-capture-select start "topic" | Start recording terminal           |
-  | khoj-capture-select mark "note"   | Mark an important moment           |
-  | khoj-capture-select stop          | Stop recording and save            |
-  | khoj-capture-select status        | Check if recording                 |
+  | Command                              | What it does                  |
+  |--------------------------------------|-------------------------------|
+  | terminal-capture "name" "desc"       | Snapshot terminal to Obsidian |
+  | terminal-capture-select start "topic"| Start recording               |
+  | terminal-capture-select mark "note"  | Mark important moment         |
+  | terminal-capture-select stop         | Stop and save to Obsidian     |
 
-Sync to Khoj
+Sync to Obsidian Vault
 
   | Command           | What it does                            |
   |-------------------|-----------------------------------------|
-  | khoj-sync         | One-time sync to Khoj                   |
-  | khoj-sync --watch | Continuous sync (watches for new files) |
-  | khoj-sync --reset | Re-upload all files (clear tracker)     |
+  | vault-sync        | Copy exports to Obsidian vault          |
+  | vault-sync --watch| Watch and sync continuously             |
 
 Shortcuts
 
-  | Alias               | Expands to                              |
-  |---------------------|-----------------------------------------|
-  | khoj-save           | khoj-export-claude --current --sync     |
-  | khoj-claude-saveas  | khoj-export-claude --current <name> --sync |
-  | khoj-claude-backup  | khoj-export-claude --all --sync         |
-  | khoj-help           | Show this help                          |
+  | Alias          | What it does                               |
+  |----------------|--------------------------------------------|
+  | claude-save    | Export current session + sync to Obsidian  |
+  | claude-saveas  | Export with custom name + sync             |
+  | claude-backup  | Export all sessions + sync                 |
+  | capture-help   | Show this help                             |
 
-Quick reference:
-  - Save current session → khoj-save (or khoj-claude-saveas "name")
-  - Backup all sessions → khoj-claude-backup
-  - Manual sync → khoj-sync
+Vault location: ~/\_vaults/ai-dev/
+  - Claude Sessions/    ← Claude Code exports
+  - Terminal Captures/  ← Terminal history
 HELP
 }
