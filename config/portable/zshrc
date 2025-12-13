@@ -125,7 +125,7 @@ khoj-claude-saveas() {
     khoj-export-claude --current "$name" --watch
 }
 
-khoj\?() {
+khoj-help() {
     cat << 'HELP'
 Claude Code Conversations
 
@@ -162,7 +162,7 @@ Shortcuts
   |---------------------|-----------------------------------------|
   | khoj-claude-backup  | khoj-export-claude --all --watch        |
   | khoj-claude-saveas  | khoj-export-claude --current <name> --watch |
-  | khoj?               | Show this help                          |
+  | khoj-help           | Show this help                          |
 
 Quick reference:
   - Claude conversations → khoj-export-claude
