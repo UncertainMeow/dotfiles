@@ -197,7 +197,3 @@ The `scripts/` directory includes helpful validation tools:
 ---
 
 Built for practical daily use in homelab and development environments.
-
-*Full disclosure: About 90% of this was architected by Claude Code because I was tired of my terminal breaking every time I touched a config file. Turns out AI is pretty good at making things that actually work. Who knew?* 🤖
-
-Contributions welcome - but honestly, it's probably easier to just ask Claude to add whatever you need.
