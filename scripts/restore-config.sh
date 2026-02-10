@@ -12,7 +12,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-BACKUP_BASE_DIR="$HOME/dotfiles_backup"
+BACKUP_BASE_DIR="$HOME/.local/state/dotfiles-backups"
 
 # Function to show usage
 show_usage() {
@@ -22,7 +22,7 @@ show_usage() {
     echo
     echo "Examples:"
     echo "  $0                                    # Interactive selection from available backups"
-    echo "  $0 ~/dotfiles_backup/manual_20240101_120000  # Restore specific backup"
+    echo "  $0 ~/.local/state/dotfiles-backups/manual_20240101_120000  # Restore specific backup"
     echo
     echo "Available backups:"
     if [[ -d "$BACKUP_BASE_DIR" ]]; then
@@ -143,8 +143,8 @@ restore_files() {
         fi
     done
 
-    if [[ -d "$HOME/dotfiles-config" ]]; then
-        cp -r "$HOME/dotfiles-config" "$SAFETY_BACKUP_DIR/" 2>/dev/null || true
+    if [[ -d "$HOME/.config/dotfiles" ]]; then
+        cp -r "$HOME/.config/dotfiles" "$SAFETY_BACKUP_DIR/" 2>/dev/null || true
     fi
 
     if [[ -d "$HOME/.config/ghostty" ]]; then

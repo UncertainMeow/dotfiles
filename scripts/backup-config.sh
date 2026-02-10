@@ -12,7 +12,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-BACKUP_BASE_DIR="$HOME/dotfiles_backup"
+BACKUP_BASE_DIR="$HOME/.local/state/dotfiles-backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_DIR="$BACKUP_BASE_DIR/manual_$TIMESTAMP"
 
@@ -36,7 +36,7 @@ declare -a FILES=(
 
 # Directories to backup
 declare -a DIRS=(
-    "$HOME/dotfiles-config"
+    "$HOME/.config/dotfiles"
     "$HOME/.config/ghostty/themes"
 )
 

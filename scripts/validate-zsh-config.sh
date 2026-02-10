@@ -5,7 +5,7 @@ set -e
 
 echo "🔍 Validating zsh configuration..."
 
-ZSH_CONFIG_DIR="$HOME/dotfiles-config/zsh"
+ZSH_CONFIG_DIR="$HOME/.config/dotfiles/zsh"
 ERRORS=0
 
 # Check for alias/function name conflicts

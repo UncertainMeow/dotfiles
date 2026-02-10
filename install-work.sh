@@ -15,8 +15,8 @@ fi
 
 # Backup existing files
 echo "📦 Backing up existing configurations..."
-mkdir -p ~/dotfiles_backup/$(date +%Y%m%d_%H%M%S)
-BACKUP_DIR=~/dotfiles_backup/$(date +%Y%m%d_%H%M%S)
+mkdir -p ~/.local/state/dotfiles-backups/$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR=~/.local/state/dotfiles-backups/$(date +%Y%m%d_%H%M%S)
 
 cp ~/.tmux.conf "$BACKUP_DIR/" 2>/dev/null && echo "  ✓ Backed up ~/.tmux.conf" || echo "  - No existing ~/.tmux.conf"
 cp ~/.zshrc "$BACKUP_DIR/" 2>/dev/null && echo "  ✓ Backed up ~/.zshrc" || echo "  - No existing ~/.zshrc"
@@ -49,7 +49,8 @@ cp .zshrc ~ && echo "  ✓ zsh configuration (modular setup)"
 
 # Copy modular config directory
 if [[ -d config ]]; then
-    cp -r config ~/dotfiles-config && echo "  ✓ modular zsh configurations"
+    mkdir -p ~/.config/dotfiles
+    cp -r config ~/.config/dotfiles/ && echo "  ✓ modular zsh configurations"
 else
     echo "  ⚠️  config directory not found"
 fi

@@ -125,7 +125,7 @@ echo
 echo "📂 Syncing modular configurations..."
 
 # Sync the modular config directory
-if sync_directory "$HOME/dotfiles-config/zsh" "$REPO_DIR/config/zsh" "Modular zsh configs"; then
+if sync_directory "$HOME/.config/dotfiles/zsh" "$REPO_DIR/config/zsh" "Modular zsh configs"; then
     ((CHANGES_MADE++))
 fi
 

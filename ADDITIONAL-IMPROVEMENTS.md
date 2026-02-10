@@ -129,8 +129,8 @@ cd ~/path/to/dotfiles/repo
 ```bash
 # Copy updated files
 cp .zshrc ~/.zshrc
-cp config/zsh/functions.zsh ~/dotfiles-config/zsh/
-cp config/zsh/keybindings.zsh ~/dotfiles-config/zsh/
+cp config/zsh/functions.zsh ~/.config/dotfiles/zsh/
+cp config/zsh/keybindings.zsh ~/.config/dotfiles/zsh/
 
 # Reload shell
 source ~/.zshrc
@@ -191,7 +191,7 @@ cd netw[Tab should accept grey text]
 
 ### Customize Tab Behavior
 
-Edit `~/dotfiles-config/zsh/keybindings.zsh`:
+Edit `~/.config/dotfiles/zsh/keybindings.zsh`:
 
 ```zsh
 # Option 1: Keep smart Tab (current)
@@ -232,7 +232,7 @@ bindkey '^[[Z' reverse-menu-complete # Shift+Tab for reverse completion
 **Symptom:** Command not found: alias-help
 
 **Solutions:**
-1. Check file deployed: `ls -la ~/dotfiles-config/zsh/functions.zsh`
+1. Check file deployed: `ls -la ~/.config/dotfiles/zsh/functions.zsh`
 2. Reload: `source ~/.zshrc`
 3. Verify loading: `type alias-help`
 

@@ -142,6 +142,22 @@ newproj() {
 
 # === Git Functions ===
 
+# Git worktree management (great for parallel work)
+gwt() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: gwt <branch_name>"
+        echo "Creates a worktree at ../$(basename $(pwd))-<branch>"
+        return 1
+    fi
+
+    local branch="$1"
+    local worktree_dir="../$(basename $(pwd))-$branch"
+
+    git worktree add "$worktree_dir" "$branch"
+    echo "✓ Worktree created: $worktree_dir"
+    echo "  cd to it: cd $worktree_dir"
+}
+
 # Git commit with timestamp
 gct() {
     local message="${1:-Update: $(date '+%Y-%m-%d %H:%M')}"
@@ -247,22 +263,55 @@ largest() {
     du -ah . | sort -rh | head -n "$count"
 }
 
+# Directory size with exclusions (faster for development directories)
+dsize() {
+    local target="${1:-.}"
+    echo "Calculating size of $target (excluding node_modules, .git)..."
+    du -sh "$target" --exclude=node_modules --exclude=.git --exclude=target --exclude=dist 2>/dev/null || \
+        du -sh "$target" 2>/dev/null
+}
+
 # === Network Functions ===
 
-# Port checker
+# Port checker with enhanced fallbacks
 port() {
     if [[ -z "$1" ]]; then
         echo "Usage: port <port_number>"
         return 1
     fi
-    
+
     local port="$1"
     if command -v lsof > /dev/null 2>&1; then
-        lsof -i ":$port"
+        lsof -i ":$port" 2>/dev/null || echo "Nothing listening on port $port"
+    elif command -v ss > /dev/null 2>&1; then
+        ss -tulpn 2>/dev/null | grep ":$port" || echo "Nothing listening on port $port"
     elif command -v netstat > /dev/null 2>&1; then
-        netstat -tuln | grep ":$port"
+        netstat -tuln 2>/dev/null | grep ":$port" || echo "Nothing listening on port $port"
     else
-        echo "Neither lsof nor netstat available"
+        echo "No port checking tool available (tried: lsof, ss, netstat)"
+        return 1
+    fi
+}
+
+# Kill process by port (great for development)
+killport() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: killport <port_number>"
+        return 1
+    fi
+
+    local port="$1"
+    if command -v lsof > /dev/null 2>&1; then
+        local pids=$(lsof -ti ":$port" 2>/dev/null)
+        if [[ -n "$pids" ]]; then
+            echo "Killing processes on port $port: $pids"
+            echo "$pids" | xargs kill -9
+            echo "✓ Processes killed"
+        else
+            echo "No process found on port $port"
+        fi
+    else
+        echo "lsof not available"
         return 1
     fi
 }
@@ -272,6 +321,30 @@ serve() {
     local port=${1:-8000}
     echo "Serving on http://localhost:$port"
     python3 -m http.server "$port"
+}
+
+# Serve on LAN (accessible from other homelab devices)
+serve-lan() {
+    local port=${1:-8000}
+    local ip
+
+    # Try to get local IP
+    if command -v ipconfig > /dev/null 2>&1; then
+        # macOS
+        ip=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null)
+    elif command -v hostname > /dev/null 2>&1; then
+        # Linux
+        ip=$(hostname -I 2>/dev/null | cut -d' ' -f1)
+    fi
+
+    if [[ -n "$ip" ]]; then
+        echo "🌐 Serving on http://$ip:$port"
+        echo "   (Accessible from other devices on your network)"
+        python3 -m http.server "$port" --bind "$ip"
+    else
+        echo "⚠️  Could not determine local IP, serving on all interfaces"
+        python3 -m http.server "$port" --bind 0.0.0.0
+    fi
 }
 
 # === Text Processing ===
@@ -294,6 +367,19 @@ loc() {
 }
 
 # === Docker Functions ===
+
+# Docker compose shortcuts
+dcu() {
+    docker compose up -d "$@"
+}
+
+dcd() {
+    docker compose down "$@"
+}
+
+dcl() {
+    docker compose logs -f "$@"
+}
 
 # Docker cleanup
 dcleanup() {
@@ -321,7 +407,42 @@ dsh() {
     fi
 }
 
+# === Kubernetes Functions ===
+
+# Quick context switching
+kctx() {
+    if [[ -z "$1" ]]; then
+        echo "Available contexts:"
+        kubectl config get-contexts
+        return 0
+    fi
+    kubectl config use-context "$1"
+}
+
+# Quick namespace switching
+kns() {
+    if [[ -z "$1" ]]; then
+        echo "Current namespace:"
+        kubectl config view --minify --output 'jsonpath={..namespace}'
+        echo
+        return 0
+    fi
+    kubectl config set-context --current --namespace="$1"
+    echo "✓ Switched to namespace: $1"
+}
+
 # === Utility Functions ===
+
+# Tail with follow and configurable lines
+tailf() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: tailf <file> [lines]"
+        return 1
+    fi
+    local file="$1"
+    local lines="${2:-50}"
+    tail -n "$lines" -f "$file"
+}
 
 # Weather for specific city
 weather() {
@@ -471,27 +592,45 @@ funcs() {
     echo "  mkcd <dir>     - Make and cd to directory"
     echo "  up [n]         - Go up N directories"
     echo "  cdf <pattern>  - Find and cd to directory"
+    echo "  dsize [dir]    - Directory size (excludes node_modules, .git)"
     echo
     echo "📋 Projects:"
     echo "  proj [name]    - Switch to project or list projects"
     echo "  newproj <lang> <name> - Create new project"
     echo
     echo "🔧 Git:"
+    echo "  gwt <branch>   - Create git worktree for parallel work"
     echo "  gct [msg]      - Commit with timestamp"
     echo "  gstatus        - Status of all repos in current dir"
     echo "  glogf          - Formatted git log"
+    echo
+    echo "🐳 Docker:"
+    echo "  dcu [service]  - Docker compose up -d"
+    echo "  dcd [service]  - Docker compose down"
+    echo "  dcl [service]  - Docker compose logs -f"
+    echo "  dcleanup       - Clean up Docker (prune everything)"
+    echo
+    echo "☸️  Kubernetes:"
+    echo "  kctx [name]    - Switch kubectl context"
+    echo "  kns [name]     - Switch kubectl namespace"
     echo
     echo "📄 Files:"
     echo "  extract <file> - Extract any archive"
     echo "  backup <item>  - Backup file or directory"
     echo "  largest [n]    - Show largest files"
+    echo "  tailf <file> [n] - Tail last N lines and follow"
     echo
     echo "💻 System:"
     echo "  sysinfo        - System information summary"
     echo "  port <num>     - Check what's using a port"
+    echo "  killport <num> - Kill process by port number"
+    echo
+    echo "🌐 Network:"
+    echo "  serve [port]     - HTTP server on localhost"
+    echo "  serve-lan [port] - HTTP server accessible on LAN"
+    echo "  weather [city]   - Weather forecast"
     echo
     echo "🛠️  Utils:"
-    echo "  weather [city] - Weather forecast"
     echo "  genpass [len]  - Generate random password"
     echo "  timer <time>   - Countdown timer"
 }

@@ -22,10 +22,10 @@ if [[ -d "$ZSH_CONFIG_DIR" ]]; then
 fi
 ```
 
-**How it works:** When you open a new terminal, zsh runs this file first. It determines where your config modules are located (`~/dotfiles-config/zsh/` or in the repo), then systematically loads each module.
+**How it works:** When you open a new terminal, zsh runs this file first. It determines where your config modules are located (`~/.config/dotfiles/zsh/` or in the repo), then systematically loads each module.
 
 ### 2. Config Modules - The Individual Musicians
-**Location:** `~/dotfiles-config/zsh/` (copied from `config/zsh/` in the repo)
+**Location:** `~/.config/dotfiles/zsh/` (copied from `config/zsh/` in the repo)
 
 Each module handles one aspect of your shell:
 
@@ -62,7 +62,7 @@ cp -r config ~/dotfiles-config && echo "✓ modular zsh configurations"
 When you open a terminal, here's what happens:
 
 1. **zsh starts** → reads `~/.zshrc`
-2. **`.zshrc` looks for modules** → finds `~/dotfiles-config/zsh/`
+2. **`.zshrc` looks for modules** → finds `~/.config/dotfiles/zsh/`
 3. **Loads core modules in order:**
    - `environment.zsh` → Sets up PATH, variables, tool integrations
    - `history.zsh` → Configures command history
@@ -88,7 +88,7 @@ HOME/
 │   └── alacritty/
 │       ├── alacritty.toml           # Alacritty settings (from repo)
 │       └── themes/catppuccin-mocha.toml # Theme file (from repo)
-└── dotfiles-config/                 # Modular configs (from repo)
+└── .config/dotfiles/                 # Modular configs (from repo)
     └── zsh/
         ├── environment.zsh          # PATH, exports, tool setup
         ├── aliases.zsh              # Command shortcuts
@@ -105,7 +105,7 @@ dotfiles/
 ├── alacritty_config.toml           # Gets copied to ~/.config/alacritty/alacritty.toml
 ├── alacritty_theme_catppuccin-mocha.toml # Gets copied to ~/.config/alacritty/themes/
 ├── install.sh                      # The installer script
-└── config/zsh/                     # Gets copied to ~/dotfiles-config/zsh/
+└── config/zsh/                     # Gets copied to ~/.config/dotfiles/zsh/
     ├── environment.zsh
     ├── aliases.zsh
     └── ...
@@ -116,7 +116,7 @@ dotfiles/
 ### Option 1: Edit Live Config (Quick Changes)
 ```bash
 # Edit the actual config that's being used
-nano ~/dotfiles-config/zsh/aliases.zsh
+nano ~/.config/dotfiles/zsh/aliases.zsh
 # Changes take effect in new terminals immediately
 ```
 
@@ -157,10 +157,10 @@ nano ~/.zshrc.local
 
 ### "My changes aren't showing up"
 - Did you open a new terminal? Changes only apply to new sessions
-- Are you editing the right file? Check `~/dotfiles-config/zsh/` not the repo
+- Are you editing the right file? Check `~/.config/dotfiles/zsh/` not the repo
 
 ### "I broke something"
-- Restore from backup: `~/dotfiles_backup/YYYYMMDD_HHMMSS/`
+- Restore from backup: `~/.local/state/dotfiles-backups/YYYYMMDD_HHMMSS/`
 - Or reinstall: `cd dotfiles && ./install.sh`
 
 ### "I want to reset everything"
