@@ -1,0 +1,32 @@
+[user]
+    name = Kellen Malstrom
+    email = kmalst@gmail.com
+
+[core]
+    pager = delta
+    editor = nano
+    autocrlf = input
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    side-by-side = true
+    line-numbers = true
+    syntax-theme = Catppuccin Mocha
+
+[merge]
+    conflictstyle = zdiff3
+
+[diff]
+    colorMoved = default
+
+[pull]
+    rebase = false
+
+[init]
+    defaultBranch = main
+
+[push]
+    autoSetupRemote = true

@@ -1,0 +1,9 @@
+# bat configuration
+# https://github.com/sharkdp/bat
+
+--theme="Catppuccin Mocha"
+--style="numbers,changes,header"
+--italic-text=always
+
+# Use less as pager with color support
+--pager="less -FR"

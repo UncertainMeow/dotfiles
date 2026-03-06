@@ -1,188 +1,37 @@
 # =============================================================================
-# HOMELAB DOTFILES - Modular Terminal Setup
+# PORTABLE ZSHRC - Minimal config for SSH sessions on remote servers
+# Deploy with: deploy-dots user@host
 # =============================================================================
 
-# Instant prompt for Powerlevel10k
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# History
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.zsh_history
+setopt appendhistory sharehistory hist_ignore_all_dups hist_ignore_space
 
-typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+# Shell options
+setopt auto_cd no_beep interactive_comments
+setopt auto_pushd pushd_ignore_dups
 
-# =============================================================================
-# MODULAR CONFIG LOADING
-# =============================================================================
-
-# Get the directory where config modules are located
-# Prefer deployed config in ~/dotfiles-config over repo location
-if [[ -d "$HOME/dotfiles-config/zsh" ]]; then
-    ZSH_CONFIG_DIR="$HOME/dotfiles-config/zsh"
-elif [[ -d "${${(%):-%x}:A:h}/config/zsh" ]]; then
-    ZSH_CONFIG_DIR="${${(%):-%x}:A:h}/config/zsh"
-else
-    ZSH_CONFIG_DIR=""
-fi
-
-# Load modular configurations
-if [[ -d "$ZSH_CONFIG_DIR" ]]; then
-  # Load utilities library first (used by other modules)
-  [[ -f "$ZSH_CONFIG_DIR/lib/utils.zsh" ]] && source "$ZSH_CONFIG_DIR/lib/utils.zsh"
-
-  # Core configuration modules
-  [[ -f "$ZSH_CONFIG_DIR/environment.zsh" ]] && source "$ZSH_CONFIG_DIR/environment.zsh"
-  [[ -f "$ZSH_CONFIG_DIR/history.zsh" ]] && source "$ZSH_CONFIG_DIR/history.zsh"
-  [[ -f "$ZSH_CONFIG_DIR/completion.zsh" ]] && source "$ZSH_CONFIG_DIR/completion.zsh"
-  [[ -f "$ZSH_CONFIG_DIR/aliases.zsh" ]] && source "$ZSH_CONFIG_DIR/aliases.zsh"
-  [[ -f "$ZSH_CONFIG_DIR/functions.zsh" ]] && source "$ZSH_CONFIG_DIR/functions.zsh"
-  
-  # OS-specific configurations
-  case "$(uname -s)" in
-    Darwin*)
-      [[ -f "$ZSH_CONFIG_DIR/os/macos.zsh" ]] && source "$ZSH_CONFIG_DIR/os/macos.zsh"
-      ;;
-    Linux*)
-      # Detect specific Linux distributions
-      if [[ -f /etc/arch-release ]]; then
-        [[ -f "$ZSH_CONFIG_DIR/os/arch.zsh" ]] && source "$ZSH_CONFIG_DIR/os/arch.zsh"
-      elif [[ -f /etc/fedora-release ]] && grep -q "Bazzite" /etc/os-release 2>/dev/null; then
-        [[ -f "$ZSH_CONFIG_DIR/os/bazzite.zsh" ]] && source "$ZSH_CONFIG_DIR/os/bazzite.zsh"
-      elif [[ -f /etc/NIXOS ]]; then
-        [[ -f "$ZSH_CONFIG_DIR/os/nixos.zsh" ]] && source "$ZSH_CONFIG_DIR/os/nixos.zsh"
-      fi
-      ;;
-  esac
-fi
-
-# =============================================================================
-# SHELL OPTIONS & BEHAVIOR (from your working config)
-# =============================================================================
-setopt auto_cd extended_glob no_beep correct_all interactive_comments
-setopt auto_pushd pushd_ignore_dups pushd_minus
-
-# =============================================================================
-# ZINIT PLUGIN MANAGER (from your working config)
-# =============================================================================
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-if [ ! -d "$ZINIT_HOME" ]; then
-  mkdir -p "$(dirname "$ZINIT_HOME")"
-  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-fi
-source "$ZINIT_HOME/zinit.zsh"
-
-# =============================================================================
-# ZINIT PLUGINS (from your working config)
-# =============================================================================
-
-# Load powerlevel10k theme
-zinit ice depth"1"
-zinit load romkatv/powerlevel10k
-
-# Essential plugins for infrastructure work
-zinit light zsh-users/zsh-autosuggestions
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-
-# Additional useful plugins
-zinit light Aloxaf/fzf-tab
-zinit light hlissner/zsh-autopair
-
-# Load completions
+# Basic completion
 autoload -Uz compinit && compinit
-zinit cdreplay -q
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*:*:*:*:*' menu select
 
-# Load custom keybindings (after plugins for smart Tab completion)
-[[ -f "$ZSH_CONFIG_DIR/keybindings.zsh" ]] && source "$ZSH_CONFIG_DIR/keybindings.zsh"
-
-# =============================================================================
-# COLORS & VISUAL (from your working config)  
-# =============================================================================
-if command -v vivid >/dev/null 2>&1; then
-  export LS_COLORS="$(vivid generate catppuccin-mocha)"
-elif command -v gdircolors >/dev/null 2>&1; then
-  eval "$(gdircolors -b 2>/dev/null || true)"
+# Colors
+export CLICOLOR=1
+if command -v dircolors >/dev/null 2>&1; then
+  eval "$(dircolors -b)"
 fi
 
-# =============================================================================
-# FINAL CONFIGURATIONS
-# =============================================================================
+# Load portable aliases and functions
+for f in ~/.config/zsh/aliases.zsh ~/.config/zsh/functions.zsh; do
+  [[ -f "$f" ]] && source "$f"
+done
 
-# Load prompt configuration if it exists
-[[ -f "$ZSH_CONFIG_DIR/prompt.zsh" ]] && source "$ZSH_CONFIG_DIR/prompt.zsh"
+# Simple prompt with hostname (important for SSH)
+PROMPT='%F{cyan}%n%f@%F{blue}%m%f %F{green}%~%f %# '
 
-# Load any local customizations (not tracked in git)
-[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# Personal scripts library
-export PATH="$HOME/scripts/bin:$PATH"
-
-# Session capture utilities (saves to Obsidian vault)
-export OBSIDIAN_VAULT="$HOME/_vaults/ai-dev"
-export CLAUDE_EXPORT_DIR="$HOME/.local/share/claude-exports"
-export CLAUDE_BACKUP_DIR="$HOME/Backups/claude-sessions"
-
-alias claude-save-all='claude-export --all --sync'
-claude-saveas() {
-    local name="${1:-claude-$(date +%Y%m%d-%H%M%S)}"
-    claude-export --current "$name" --sync
-}
-alias claude-save='claude-export --current --sync'
-
-# Backup to pristine folder (for Google Drive/NAS sync)
-claude-backup() {
-    mkdir -p "$CLAUDE_BACKUP_DIR"
-    echo "[INFO] Backing up to $CLAUDE_BACKUP_DIR..."
-    cp -r "$CLAUDE_EXPORT_DIR"/*.md "$CLAUDE_BACKUP_DIR/" 2>/dev/null || true
-    local count=$(ls -1 "$CLAUDE_BACKUP_DIR"/*.md 2>/dev/null | wc -l | tr -d ' ')
-    echo "[OK] Backed up $count files to $CLAUDE_BACKUP_DIR"
-}
-
-capture-help() {
-    cat << 'HELP'
-Claude Code Sessions → Obsidian
-
-  | Command                        | What it does                       |
-  |--------------------------------|------------------------------------|
-  | claude-export --list           | List all Claude Code sessions      |
-  | claude-export --current "name" | Export current/most recent session |
-  | claude-export --recent N       | Export last N sessions             |
-  | claude-export --all            | Export all sessions                |
-  |                                |                                    |
-  | Add --sync to copy to Obsidian vault                                 |
-
-Terminal History → Obsidian
-
-  | Command                              | What it does                  |
-  |--------------------------------------|-------------------------------|
-  | terminal-capture "name" "desc"       | Snapshot terminal to Obsidian |
-  | terminal-capture-select start "topic"| Start recording               |
-  | terminal-capture-select mark "note"  | Mark important moment         |
-  | terminal-capture-select stop         | Stop and save to Obsidian     |
-
-Sync to Obsidian Vault
-
-  | Command           | What it does                            |
-  |-------------------|-----------------------------------------|
-  | vault-sync        | Copy exports to Obsidian vault          |
-  | vault-sync --watch| Watch and sync continuously             |
-
-Shortcuts
-
-  | Alias           | What it does                               |
-  |-----------------|--------------------------------------------|
-  | claude-save     | Export current session + sync to Obsidian  |
-  | claude-saveas   | Export with custom name + sync             |
-  | claude-save-all | Export all sessions + sync to Obsidian     |
-  | claude-backup   | Copy exports to pristine backup folder     |
-  | capture-help    | Show this help                             |
-
-Locations:
-  Obsidian vault: ~/\_vaults/ai-dev/
-    - Claude Sessions/    ← Claude Code exports
-    - Terminal Captures/  ← Terminal history
-  Backup folder: ~/Backups/claude-sessions/
-    - Pristine copies for Google Drive/NAS sync
-HELP
-}
+# Editor
+export EDITOR="${EDITOR:-vim}"
+export VISUAL="$EDITOR"

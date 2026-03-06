@@ -96,27 +96,22 @@ alias localip='hostname -I | cut -d" " -f1'  # Local IP
 # File operations with progress
 alias rsync='rsync --progress'
 
-# Modern tools (if available)
+# Modern tools (only alias when replacement accepts the same syntax/args)
+# Rule: only shadow a command if the replacement is a drop-in.
+# If the syntax differs, give it its own name so muscle memory isn't broken.
 if command -v bat > /dev/null 2>&1; then
     alias cat='bat --paging=never'
-    alias less='bat'
 fi
 
-if command -v fd > /dev/null 2>&1; then
-    alias find='fd'
-fi
-
-if command -v rg > /dev/null 2>&1; then
-    alias grep='rg'
-fi
-
-if command -v htop > /dev/null 2>&1; then
+if command -v btop > /dev/null 2>&1; then
+    alias top='btop'
+elif command -v htop > /dev/null 2>&1; then
     alias top='htop'
 fi
 
-if command -v ncdu > /dev/null 2>&1; then
-    alias du='ncdu'
-fi
+# These are NOT drop-in replacements — don't shadow the originals.
+# Use them by their real names: fd, rg, dust, duf, ncdu
+# e.g. fd 'pattern' instead of find, rg 'pattern' instead of grep
 
 # Package management shortcuts (OS-specific, will be overridden in OS modules)
 alias pkg-update='echo "Override this in os-specific config"'
