@@ -56,11 +56,11 @@ cp .tmux.conf ~/.config/tmux/tmux.conf && echo "  ✓ tmux configuration → ~/.
 cp .zshrc ~ && echo "  ✓ zsh configuration"
 
 # Copy modular config directory
-if [[ -d config ]]; then
+if [[ -d config/zsh ]]; then
     mkdir -p ~/.config/dotfiles
-    cp -r config ~/.config/dotfiles/ && echo "  ✓ modular zsh configurations"
+    cp -r config/zsh ~/.config/dotfiles/ && echo "✓ modular zsh configurations"
 else
-    echo "  ⚠️  config directory not found"
+    echo "config/zsh directory not found"
 fi
 
 # Copy optional files if they exist
