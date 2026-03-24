@@ -10,8 +10,10 @@ Make sure these exist and are current before touching the reset button:
 
 - [ ] `sops-age-homelab` is in 1Password HomeLab vault (the 3-line age key block)
 - [ ] All SSH keys are in 1Password (they should be — policy enforces this)
-- [ ] Dotfiles repo is pushed to GitLab: `cd ~/code/dotfiles && git status`
-- [ ] HomeLab_IaC repo is pushed: `cd ~/code/HomeLab_IaC && git status`
+- [ ] Dotfiles repo is pushed to GitHub: `cd ~/code/dotfiles && git status`
+- [ ] HomeLab_IaC repos are pushed: `cd ~/code/HomeLab_IaC && git status` (check each sub-repo)
+- [ ] XPipe vault repo is pushed: `cd ~/code/xpipe-config && git status`
+- [ ] XPipe Vault Passphrase is in 1Password (search: "XPipe Vault Passphrase")
 - [ ] Any other repos with uncommitted work are pushed
 
 ---
@@ -104,7 +106,35 @@ ansible-playbook site.yml --tags traefik -l rawls --check
 
 ---
 
-## Phase 5: Everything Else
+## Phase 5: XPipe
+
+XPipe stores connection configs in an encrypted vault backed up to GitLab. SSH keys come
+from the 1Password agent — XPipe itself never holds them.
+
+### 11. Install XPipe
+```bash
+brew install --cask xpipe
+```
+Or download from xpipe.io (you have a lifetime license — check 1Password or email for the key).
+
+### 12. Restore vault from GitLab
+```bash
+# XPipe will prompt for a git repo on first launch, OR:
+# Open XPipe → Settings → Sync → point at your GitLab vault repo
+# URL: git@gitlab.hq.doofus.co:kellen/xpipe-config.git  (verify exact repo name)
+```
+
+### 13. Enter vault passphrase
+- 1Password → HomeLab vault → "XPipe Vault Passphrase"
+- Paste when XPipe prompts on first open
+
+### 14. Verify 1Password SSH agent is connected
+- XPipe → Settings → SSH → confirm 1Password agent is detected
+- Test a connection to any homelab host — it should auth via 1Password without asking for a key
+
+---
+
+## Phase 6: Everything Else
 
 - [ ] **Tailscale**: `brew install --cask tailscale` → sign in
 - [ ] **Other repos**: clone from GitLab as needed
