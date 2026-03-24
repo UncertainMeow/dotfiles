@@ -10,9 +10,9 @@ Make sure these exist and are current before touching the reset button:
 
 - [ ] `sops-age-homelab` is in 1Password HomeLab vault (the 3-line age key block)
 - [ ] All SSH keys are in 1Password (they should be — policy enforces this)
-- [ ] Dotfiles repo is pushed to GitHub: `cd ~/code/dotfiles && git status`
-- [ ] HomeLab_IaC repos are pushed: `cd ~/code/HomeLab_IaC && git status` (check each sub-repo)
-- [ ] XPipe vault repo is pushed: `cd ~/code/xpipe-config && git status`
+- [ ] Dotfiles repo is pushed to GitHub: `cd ~/_code/dotfiles && git status`
+- [ ] HomeLab_IaC repos are pushed: `cd ~/_code/HomeLab_IaC && git status` (check each sub-repo)
+- [ ] XPipe vault repo is pushed: `cd ~/_code/xpipe-config && git status`
 - [ ] XPipe Vault Passphrase is in 1Password (search: "XPipe Vault Passphrase")
 - [ ] Any other repos with uncommitted work are pushed
 
@@ -54,7 +54,7 @@ eval $(op signin --account my.1password.com)
 ### 6. Restore SOPS age key
 ```bash
 # Clone dotfiles first (needs git, which you have)
-git clone git@gitlab.hq.doofus.co:kellen/dotfiles.git ~/code/dotfiles
+git clone git@gitlab.hq.doofus.co:kellen/dotfiles.git ~/_code/dotfiles
 
 # Run the restore script
 bash ~/code/dotfiles/scripts/restore-sops-key.sh
@@ -74,7 +74,7 @@ Then retry the git clone.
 
 ### 7. Install dotfiles
 ```bash
-cd ~/code/dotfiles
+cd ~/_code/dotfiles
 ./install.sh
 ```
 Open a new terminal after this — your zshrc is now live.
@@ -85,21 +85,21 @@ Open a new terminal after this — your zshrc is now live.
 
 ### 8. Clone HomeLab_IaC
 ```bash
-git clone git@gitlab.hq.doofus.co:kellen/HomeLab_IaC.git ~/code/HomeLab_IaC
-cd ~/code/HomeLab_IaC/infrastructure-core/ansible
+git clone git@gitlab.hq.doofus.co:kellen/HomeLab_IaC.git ~/_code/HomeLab_IaC
+cd ~/_code/HomeLab_IaC/infrastructure-core/ansible
 ansible-galaxy collection install community.sops
 ```
 
 ### 9. Verify SOPS is working
 ```bash
 # Open a new terminal first so SOPS_AGE_KEY_FILE is set from your zshrc
-sops --decrypt ~/code/HomeLab_IaC/infrastructure-core/ansible/group_vars/all.sops.yml | head -5
+sops --decrypt ~/_code/HomeLab_IaC/infrastructure-core/ansible/group_vars/all.sops.yml | head -5
 ```
 You should see plaintext YAML with your secrets. If you do, everything is working.
 
 ### 10. Test an Ansible run
 ```bash
-cd ~/code/HomeLab_IaC/infrastructure-core/ansible
+cd ~/_code/HomeLab_IaC/infrastructure-core/ansible
 ansible-playbook site.yml --tags traefik -l rawls --check
 ```
 `--check` is a dry run — it won't change anything, just verifies connectivity and var loading.
@@ -121,7 +121,7 @@ Or download from xpipe.io (you have a lifetime license — check 1Password or em
 ```bash
 # XPipe will prompt for a git repo on first launch, OR:
 # Open XPipe → Settings → Sync → point at your GitLab vault repo
-# URL: git@gitlab.hq.doofus.co:kellen/xpipe-config.git  (verify exact repo name)
+# URL: git@gitlab.hq.doofus.co:homelab/xpipe-config.git
 ```
 
 ### 13. Enter vault passphrase
