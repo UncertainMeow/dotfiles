@@ -21,7 +21,7 @@ export XDG_DOCUMENTS_DIR="$HOME/Documents"
 [[ -d "$HOME/.local/share/npm/bin" ]] && export PATH="$HOME/.local/share/npm/bin:$PATH"    # Node.js
 
 # Application Configuration
-export EDITOR="nvim"
+export EDITOR="nano"
 export VISUAL="$EDITOR"
 export PAGER="less"
 export BROWSER="firefox"
@@ -52,6 +52,9 @@ export KUBECONFIG="$XDG_CONFIG_HOME/kube/config"
 # GPG XDG compliance (if using modern GPG)
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 
+# SOPS age key (for decrypting homelab secrets)
+export SOPS_AGE_KEY_FILE="$XDG_CONFIG_HOME/sops/age/keys.txt"
+
 # Development Environment
 export DEVELOPMENT_DIR="$XDG_DOCUMENTS_DIR/coding-projects"
 
@@ -70,6 +73,7 @@ mkdir -p "$XDG_STATE_HOME/less" \
          "$XDG_CONFIG_HOME/npm" \
          "$XDG_CONFIG_HOME/docker" \
          "$XDG_CONFIG_HOME/aws" \
+         "$XDG_CONFIG_HOME/sops/age" \
          "$XDG_CONFIG_HOME/kube" \
          "$XDG_DATA_HOME/cargo" \
          "$XDG_DATA_HOME/rustup" \
@@ -80,6 +84,7 @@ mkdir -p "$XDG_STATE_HOME/less" \
 # Set appropriate permissions for security-sensitive directories
 [[ -d "$XDG_DATA_HOME/gnupg" ]] && chmod 700 "$XDG_DATA_HOME/gnupg"
 [[ -d "$XDG_CONFIG_HOME/aws" ]] && chmod 700 "$XDG_CONFIG_HOME/aws"
+[[ -d "$XDG_CONFIG_HOME/sops/age" ]] && chmod 700 "$XDG_CONFIG_HOME/sops/age"
 
 # =============================================================================
 # EXTERNAL TOOL INTEGRATIONS
