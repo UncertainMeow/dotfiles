@@ -57,7 +57,7 @@ eval $(op signin --account my.1password.com)
 git clone git@gitlab.hq.doofus.co:kellen/dotfiles.git ~/_code/dotfiles
 
 # Run the restore script
-bash ~/code/dotfiles/scripts/restore-sops-key.sh
+bash ~/_code/dotfiles/scripts/restore-sops-key.sh
 ```
 
 If git clone fails (SSH not set up yet), do this first:
